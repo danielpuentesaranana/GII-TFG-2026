@@ -214,7 +214,21 @@ Las siguientes funcionalidades quedan fuera del alcance de este proyecto:
 
 ### ¿Por qué esta solución y no una comercial?
 
-Añadir
+En el mercado existen soluciones mas completas y robustas para la gestión de restaurantes, pero ninguna se adapta perfectamente a las necesidades específicas de La Unión sin requerir modificaciones costosas o compromisos en la funcionalidad.
+
+
+**Funcionalidades no disponibles sin intervención del proveedor.** Los sistemas POS analizados están diseñados para un restaurante estándar. 
+- El menú del día en La Unión es variable: a veces son dos primeros, otras un único plato, o primero y segundo. Ningún POS permite configurar esto sin modificar el código o pagar al proveedor. 
+- Lo mismo ocurre con las zonas del restaurante: la mayoría usa una numeración única para todas las mesas, mientras que aquí cada zona necesita su propia numeración independiente.
+- A esto se suma que ningún sistema calcula cuánto tiempo queda para la próxima reserva de una mesa ni avisa al camarero con antelación, algo que requiere un proceso automático en el servidor que los sistemas analizados no incluyen. 
+- Los alérgenos tampoco se tratan con el rigor necesario: en los POS revisados son un campo opcional y libre, cuando deberían ser obligatorios, validados en el servidor e inmutables una vez que la comanda llega a cocina.
+- Por último, el registro detallado de tickets —qué camarero lo envió, desde qué mesa y en qué momento— solo está disponible en soluciones empresariales como Oracle Simphony, cuyo coste es inasumible para un negocio de este tamaño.
+
+**Coste inasumible para un restaurante familiar.** Las plataformas más completas requieren licencias, hardware específico o suscripciones mensuales que no son viables para un negocio de estas características. Este proyecto se despliega sobre la red WiFi y los tablets que ya tiene el local, usando tecnologías open source.
+
+**Independencia de proveedor.** Las soluciones comerciales atan al negocio a un proveedor que puede modificar precios, discontinuar el producto o exigir hardware propietario. Una solución a medida elimina esa dependencia y puede evolucionar con las necesidades reales del negocio sin coste adicional.
+
+En resumen, esta solución no pretende competir con las plataformas analizadas en términos de funcionalidades globales, sino resolver exactamente el problema de este restaurante con los recursos disponibles, de forma sostenible y económica a largo plazo.
 
 ---
 

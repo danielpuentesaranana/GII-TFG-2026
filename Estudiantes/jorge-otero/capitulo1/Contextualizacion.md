@@ -114,7 +114,7 @@ Por ejemplo, Amazon ha ampliado en diversas ocasiones su plantilla de atención 
 
 ### Sistemas de ticketing o helpdesk
 
-![](./imagenes/ticket-workflow.png)
+![](./imagenes/ticket_workflow.png)
 
 Otra de las soluciones ampliamente adoptadas por las empresas consiste en implantar sistemas de ticketing, que permiten transformar los correos electrónicos recibidos en incidencias o solicitudes gestionadas mediante un sistema centralizado.
 

@@ -1,0 +1,50 @@
+@startuml DdO
+
+hide circle
+hide empty members
+
+object cliente1 {
+    email = "cliente@empresa.com"
+}
+
+object tecnico1 {
+    responsableDe = "Madrid"
+}
+
+object correo1 {
+    asunto = "Consulta PET1234"
+    cuerpo = "Buenos dias, consulto por mi peticion"
+}
+
+object intencion1 {
+    tipo = "Consulta"
+}
+
+object peticion1 {
+    numero = "PET1234"
+}
+
+object respuesta1 {
+    asunto = "RE: Consulta PET1234"
+    cuerpo = "Su peticion se encuentra en estado Pendiente de Construccion"
+}
+
+object appPetter {
+    nombre = "Petter"
+    numero = "PET1234"
+    estado = "Pendiente de Construccion"
+}
+
+cliente1 -- correo1 : envia
+tecnico1 -- correo1 : analiza
+
+correo1 -- intencion1 : contiene
+correo1 -- peticion1 : contiene
+
+tecnico1 -- peticion1 : interpreta
+tecnico1 -- appPetter : consulta
+
+tecnico1 -- respuesta1 : genera
+respuesta1 -- cliente1 : recibe
+
+@enduml

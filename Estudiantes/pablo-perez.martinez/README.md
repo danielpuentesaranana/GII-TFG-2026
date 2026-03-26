@@ -8,35 +8,35 @@
 
 ### Índice
 
-#### [1. Introducción](Introduccion.md)
+#### [1. Introducción](./Capitulo1/Introduccion.md)
 
 #### 2. Marco teórico
 
-##### [Estado del arte](EstadoDelArte.md)
+##### [Estado del arte](./Capitulo1/EstadoDelArte.md)
 
-##### [Justificación](Justificacion.md)
+##### [Justificación](./Capitulo1/Justificacion.md)
 
-##### [Solución propuesta](Solucion.md)
+##### [Solución propuesta](./Capitulo1/SolucionPropuesta.md)
 
-##### [Objetivos general y específico](Objetivos.md)
+##### [Objetivos general y específico](./Capitulo1/Objetivos.md)
 
-##### [Alcance del proyecto](Alcance.md)
+##### [Alcance del proyecto](./Capitulo1/Alcance.md)
 
-##### [Estructura del trabajo](Estructura.md)
+##### [Estructura del trabajo](./Capitulo1/Estructura.md)
 
 #### 3. Requerimientos y requisitos
 
-##### [Entorno del dominio](Entorno.md)
+##### [Entorno del dominio](./Capitulo2/Entorno.md)
 
-##### [Necesidades del sistema](Necesidades.md)
+##### [Necesidades del sistema](./Capitulo2/Necesidades.md)
 
-##### [Requisitos funcionales](RequisitosFuncionales.md)
+##### [Requisitos funcionales](./Capitulo2/RequisitosFuncionales.md)
 
-##### [Requisitos no funcionales](RequisitosNoFuncionales.md)
+##### [Requisitos no funcionales](./Capitulo2/RequisitosNoFuncionales.md)
 
 ##### Modelo del dominio
 
-##### [Identificación de actores](Actores.md)
+##### [Identificación de actores](./Capitulo2/Actores.md)
 
 ##### Identificación y priorización de casos de uso
 

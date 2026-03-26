@@ -1,30 +1,54 @@
 @startuml DdC
 
+left to right direction
 hide circle
 hide empty members
 
-class Cliente
-class Tecnico
+skinparam linetype polyline
+skinparam packageStyle rectangle
+skinparam nodesep 80
+skinparam ranksep 80
 
-class Correo
-class Intencion
-class Peticion
-class Respuesta
+package "Actores" {
+    class Cliente
+    class Tecnico
+}
 
-class AplicacionInterna
+package "Comunicacion" {
+    class Correo
+    class Respuesta
+}
 
-Cliente -- Correo : envia
-Tecnico -- Correo : analiza
 
-Correo -- Intencion : contiene
-Correo -- Peticion : contiene
+package "Procesamiento" {
+    class Intencion
+    class Peticion
+}
 
-Tecnico -- Peticion : interpreta
+package "Sistemas Internos" {
+    class AplicacionInterna
+}
 
-Tecnico -- AplicacionInterna : Consulta
+Cliente -[hidden]-> Correo
+Correo -[hidden]-> Respuesta
+Correo -[hidden]-> Intencion
+Intencion -[hidden]-> Peticion
+Peticion -[hidden]-> AplicacionInterna
 
-Respuesta -- Cliente : recibe
 
-Tecnico -- Respuesta : genera
+Cliente "1" --> "0..*" Correo : envia
+
+Tecnico "1" --> "0..*" Correo : analiza
+
+Correo "1" *--> "1" Intencion : contiene
+Correo "1" *--> "0..1" Peticion : contiene
+
+Tecnico "1" --> "0..*" Peticion : interpreta
+Tecnico "1" ..> "1..*" AplicacionInterna : consulta
+
+Tecnico "1" -> "0..*" Respuesta : genera
+Respuesta "1" --> "1" Cliente : recibe
+
+Correo "1" --> "0..1" Respuesta : respondeA
 
 @enduml

@@ -1,0 +1,86 @@
+@startuml
+
+class EncargadoPlanificacion {
+   idEncargado
+}
+
+class Orden{
+   nombreOrden
+   infoOrden
+}
+
+class Actividad{
+   estacionDeTrabajo
+   material
+   objetivoProducción
+   dependencias
+   pautasDeControl
+}
+
+class EstaciónDeTrabajo{
+   puesto
+   tiempoTeoricoDeCiclo
+   tiempoTeoricoDeParada
+   tiempoTeoricoDeMicroparada
+}
+
+class ProducciónTeórica{
+   referencia
+   cantidad
+   unidadDeMedida
+}
+
+class AsignaciónOSplit{
+   splitId
+   puesto
+   tiempoTeórico
+   producciónTeórica
+   datosEjecución
+}
+
+class Operario{
+   idOperario
+}
+
+class DatosEjecución{
+   unidadesProducidas
+   rechazos
+   duraciónParadas
+   duraciónMicroparadas
+}
+
+class VisualTracking{
+   tiempoTeórico
+   producciónTeórica
+   datosEjecución
+}
+
+class Indicadores{
+   disponibilidad
+   rendimiento
+   calidad
+   OEE
+}
+
+EncargadoPlanificacion--> Orden: crea
+EncargadoPlanificacion--> Actividad: añade a orden
+EncargadoPlanificacion--> EstaciónDeTrabajo: añade a actividad
+EncargadoPlanificacion--> ProducciónTeórica: establece
+
+Orden--> Actividad: formada por
+
+Actividad--> EstaciónDeTrabajo: se desarrolla en
+Actividad--> AsignaciónOSplit: se divide en
+Actividad--> ProducciónTeórica: objetivo producir
+
+Operario--> DatosEjecución: imputa
+
+Operario--> AsignaciónOSplit: trabaja en
+
+DatosEjecución--> AsignaciónOSplit: proporciona info
+
+
+VisualTracking --> AsignaciónOSplit: obtiene info de
+VisualTracking --> Indicadores: calcula
+
+@enduml

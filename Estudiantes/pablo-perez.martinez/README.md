@@ -8,23 +8,42 @@
 
 ### Índice
 
-#### [1. Introducción](Introduccion.md)
+#### [1. Introducción](./Capitulo1/Introduccion.md)
 
 #### 2. Marco teórico
 
-##### [Estado del arte](EstadoDelArte.md)
+##### [Estado del arte](./Capitulo1/EstadoDelArte.md)
 
-##### [Justificación](Justificacion.md)
+##### [Justificación](./Capitulo1/Justificacion.md)
 
-##### [Solución propuesta](Solucion.md)
+##### [Solución propuesta](./Capitulo1/SolucionPropuesta.md)
 
-##### [Objetivos general y específico](Objetivos.md)
+##### [Objetivos general y específico](./Capitulo1/Objetivos.md)
 
-##### [Alcance del proyecto](Alcance.md)
+##### [Alcance del proyecto](./Capitulo1/Alcance.md)
 
-##### [Estructura del trabajo](Estructura.md)
+##### [Estructura del trabajo](./Capitulo1/Estructura.md)
 
 #### 3. Requerimientos y requisitos
+
+##### [Entorno del dominio](./Capitulo2/Entorno.md)
+
+##### [Necesidades del sistema](./Capitulo2/Necesidades.md)
+
+##### Requisitos funcionales
+
+##### [Requisitos no funcionales](./Capitulo2/RequisitosNoFuncionales.md)
+
+##### [Modelo del dominio](./Capitulo2/ModeloDelDominio.md)
+
+##### [Identificación de actores](./Capitulo2/Actores.md)
+
+##### Identificación y priorización de casos de uso
+
+##### Descripción de casos de uso
+
+##### [Prototipos](./Capitulo2/Prototipos.md)
+
 
 #### 4. Análisis y diseño
 

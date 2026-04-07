@@ -21,7 +21,8 @@
 - `FA-02` _(paso 3)_: Rol `"empleado"` → acceso denegado, mensaje informativo.
 - `FA-03` _(sesión activa)_: Token expirado → interceptor Axios detecta HTTP 401, limpia `localStorage` y redirige a `/login`.
 
-**Relaciones:** `<<include>>` por todos los demás CU (precondición universal).
+**Relaciones:** *(sin `<<include>>`/`<<extend>>` hacia otros CU)*.  
+CU-01 es **precondición** del resto de casos de uso (sesión/JWT), pero **no se modela como `<<include>>`** porque no se inserta como sub-flujo reutilizable dentro de otros CU: se ejecuta una vez para iniciar sesión.
 
 ---
 
@@ -40,13 +41,16 @@
 4. Si hay empleados sobrecargados → banner amarillo con sus nombres y enlace a CU-03.
 5. Gráfico de área de actividad (14 días) y panel de salud operativa (cumplimiento, retrabajo, lead time con barras de progreso y distribución del equipo).
 6. Distribución de tareas por etapa (barras de progreso coloreadas) y acceso rápido a CU-03, CU-08, CU-04, CU-10, CU-20, CU-21.
-7. El Responsable recibe los datos filtrados por su `project_ids` y `employee_ids`.
+7. Los accesos rápidos (p.ej. `.../tareas?status=overdue`, `.../tareas?status=pending`, `.../empleados`) son **redirecciones a otras páginas**, no sub-flujos dentro de `/overview`.
+8. El Responsable recibe los datos filtrados por su `project_ids` y `employee_ids`.
 
 **Flujos alternativos:**
 - `FA-01`: Alguna petición falla → `ErrorState` con botón Reintentar.
 - `FA-02`: Sin tareas ni proyectos → KPIs a 0, estados vacíos con iconos.
 
-**Relaciones:** `<<include>>` CU-01. Navega a CU-03, CU-04, CU-07, CU-08, CU-10, CU-13, CU-19, CU-20, CU-21.
+**Relaciones:**  
+`<<include>>` CU-13 (cumplimiento), CU-16 (retrabajo), CU-18 (lead time) *(panel de salud se carga siempre al renderizar `/overview`)*.  
+Navega a CU-03, CU-04, CU-08, CU-10, CU-20, CU-21.
 
 ---
 
@@ -60,16 +64,17 @@
 
 **Flujo principal:**
 1. El actor navega a `/manager`. Puede filtrar por departamento y alternar entre vista **Ejecutivo** y **Equipo**.
-2. El sistema carga: `GET /dashboards/summary/manager`, `/charts/workload-by-dept`, `/metrics/compliance`, `/metrics/lead-time`, `/metrics/cancelled-tasks`, `/metrics/rework-rate`, `/dashboards/overview`.
+2. El sistema carga: `GET /dashboards/summary/manager` y `GET /departments/`.
 3. 4 KPIs: total empleados, sobrecargados, subcargados, sin tareas. Banner de alerta si hay sobrecargados.
 4. **Vista Ejecutivo:** radar de salud (5 dimensiones: Cumplimiento, Eficiencia, Velocidad, Calidad, Capacidad), panel de alertas operativas, top 5 más cargados con enlace a CU-05, distribución de estados (pills + bar chart), actividad por departamento con enlace a CU-07.
 5. **Vista Equipo:** tabla de carga de trabajo ordenable por % de ocupación, con badge de estado y enlace a CU-05 por empleado.
+6. **Opcional (drill-down por estado):** al pinchar un estado (p.ej. "Sobrecargado") el sistema lista empleados de ese estado llamando a `GET /dashboards/summary/manager?page=1&page_size=12&sort_by=employee_name&sort_order=asc&status=sobrecargado`. Desde esa lista se puede navegar a CU-05.
 
 **Flujos alternativos:**
 - `FA-01`: Responsable → datos filtrados por `employee_ids` y `department_ids`.
 - `FA-02`: Sin empleados en el departamento → tabla vacía.
 
-**Relaciones:** `<<include>>` CU-01. `<<extend>>` CU-14 (carga equipo). Navega a CU-05, CU-07.
+**Relaciones:** `<<include>>` CU-06 (listar departamentos para filtro). Navega a CU-05, CU-07.
 
 ---
 
@@ -89,7 +94,7 @@
 5. Click en fila → CU-05.
 6. El Responsable solo ve empleados de su `employee_ids`.
 
-**Relaciones:** `<<include>>` CU-01. Navega a CU-05.
+**Relaciones:** Navega a CU-05.
 
 ---
 
@@ -107,18 +112,18 @@
 3. Cabecera con avatar inicial, nombre, cargo, departamento, coste/h y badge de estado de carga.
 4. 4 KPIs: tareas pendientes + horas, vencidas sin cerrar, WIP actual, productividad 30d.
 5. Sección "Hoy": tarjetas de _tareas asignadas hoy_ y _vencidas sin cerrar_, cada una clickable para abrir CU-10 con los filtros correspondientes pre-rellenados.
-6. Sección de tareas en cuatro sub-flujos (pestañas), todos ejecutando CU-10 en modo contextual:
-   - **Pendientes** (`status=pending`, `employee_id=X`, filtro de fechas opcional).
-   - **Completadas** (`status=completed`, `employee_id=X`, filtro de fechas opcional).
-   - **Asignadas** (`assigned_user=X`, toggle abierto/cerrado).
-   - **Responsable** (`responsable_id=X`, toggle abierto/cerrado).
+6. Sección de tareas en cuatro sub-flujos (pestañas), todos ejecutando CU-10 en modo contextual mediante `GET /tasks/filter`:
+   - **Tareas pendientes**: `employee_id=X`, `status=pending`.
+   - **Tareas asignadas hoy**: `employee_id=X`, `date_assign=today`.
+   - **Ver asignadas**: `employee_id=X` (todas las asignadas al empleado).
+   - **Ver responsable**: `employee_id=X`, `responsable=true` (tareas donde el empleado es responsable).
 7. Click en tarea → CU-11.
 
 **Flujos alternativos:**
 - `FA-01`: El actor intenta acceder a un empleado fuera de su alcance → HTTP 403.
 - `FA-02`: Empleado sin `user_id` vinculado → pestañas asignadas y pendientes vacías; workload y WIP a 0.
 
-**Relaciones:** `<<include>>` CU-01. `<<extend>>` CU-10 (consulta contextual de tareas), CU-14 (workload/WIP).
+**Relaciones:** *(este CU es base de extensión)* `<<extend>>` por CU-10 (consulta contextual de tareas). Navega a CU-11.
 
 ---
 
@@ -135,7 +140,7 @@
 2. El Responsable solo ve sus `department_ids`.
 3. Click en tarjeta → CU-07.
 
-**Relaciones:** `<<include>>` CU-01. Navega a CU-07.
+**Relaciones:** Navega a CU-07.
 
 ---
 
@@ -160,7 +165,7 @@
 - `FA-01`: Responsable sin acceso al departamento → HTTP 403.
 - `FA-02`: Departamento sin empleados activos → pestañas vacías.
 
-**Relaciones:** `<<include>>` CU-01. Navega a CU-05.
+**Relaciones:** Navega a CU-05.
 
 ---
 
@@ -177,7 +182,7 @@
 2. El Responsable solo ve sus `project_ids`.
 3. Click en tarjeta → CU-09.
 
-**Relaciones:** `<<include>>` CU-01. Navega a CU-09.
+**Relaciones:** Navega a CU-09.
 
 ---
 
@@ -202,7 +207,7 @@
 - `FA-01`: Sin horas imputadas → rentabilidad 0 %, gráfico de horas vacío.
 - `FA-02`: Responsable sin acceso al proyecto → HTTP 403.
 
-**Relaciones:** `<<include>>` CU-01. `<<extend>>` CU-10 (tareas del proyecto), CU-15 (riesgo calculado en `/dashboards/summary/project/{id}`). Navega a CU-05.
+**Relaciones:** Navega a CU-05 y CU-11.
 
 ---
 
@@ -229,7 +234,7 @@
 - `FA-01`: Sin tareas para los filtros aplicados → estado vacío con mensaje.
 - `FA-02`: Responsable intentando filtrar por proyecto fuera de su alcance → HTTP 403.
 
-**Relaciones:** `<<include>>` CU-01. `<<extend>>` desde CU-05 y CU-09. Navega a CU-11.
+**Relaciones:** Navega a CU-11.
 
 ---
 
@@ -253,7 +258,7 @@
 - `FA-01`: Tarea no encontrada → HTTP 404.
 - `FA-02`: Responsable con tarea fuera de sus proyectos → HTTP 403.
 
-**Relaciones:** `<<include>>` CU-01. `<<extend>>` desde CU-10. Navega a CU-05, CU-09, CU-11 (recursivo en subtareas).
+**Relaciones:** Navega a CU-05, CU-09, CU-11 (recursivo en subtareas).
 
 ---
 
@@ -266,13 +271,13 @@
 | **Postcondición** | El actor conoce la eficiencia de ejecución frente a la estimación. |
 
 **Flujo principal:**
-1. El actor accede a la métrica en `/metrics` y opcionalmente selecciona empleado, proyecto y rango de fechas.
-2. `GET /metrics/productivity` → promedio de `(planificadas/reales)×100` para tareas cerradas con horas > 0.
+1. El actor navega a `/metrics`. **Al entrar no se llama a ninguna métrica por defecto**; solo se cargan datos de apoyo para filtros: `GET /employees/?page_size=200`, `GET /projects/`.
+2. Al pinchar en la tarjeta/sección "Productividad" se ejecuta `GET /metrics/productivity` (con filtros opcionales por empleado/proyecto/rango de fechas).
 3. Gauge de % promedio + total tareas analizadas.
 4. Gráfico de barras horizontal: top 8 tareas por productividad individual.
 5. El Responsable sin filtros recibe el agregado ponderado de todos sus proyectos.
 
-**Relaciones:** `<<include>>` CU-01. Accesible desde CU-05 (KPI de productividad 30d) y `/metrics`.
+**Relaciones:** Accesible desde `/metrics`.
 
 ---
 
@@ -288,25 +293,53 @@
 1. `GET /metrics/compliance` (filtros: `employee_id`, `project_id`, `root_only`) → `compliance_rate = (on_time / total) × 100` donde `on_time` = `date_end ≤ date_deadline`.
 2. Doughnut chart central con % y KPIs (a tiempo, con retraso, total).
 
-**Relaciones:** `<<include>>` CU-01. Visible en CU-02 (panel de salud) y CU-03 (radar de salud).
+**Relaciones:** `<<include>>` desde CU-02 (panel de salud en `/overview`).
 
 ---
 
-## CU-14 – Consultar Carga de Trabajo y WIP
+## CU-28 – Consultar Carga de Trabajo (Workload) de Empleado
 
-| Campo | Valor |
-|---|---|
-| **Actores** | Director, Responsable |
-| **Precondición** | CU-01. Empleado seleccionado. |
-| **Postcondición** | El actor identifica empleados con sobre/infracarga y nivel de paralelismo. |
+| Campo             | Valor                                               |
+| ----------------- | --------------------------------------------------- |
+| **Actores**       | Director, Responsable                               |
+| **Precondición**  | CU-01. Empleado seleccionado.                       |
+| **Postcondición** | El actor identifica empleados con sobre/infracarga. |
 
 **Flujo principal:**
-1. El actor selecciona empleado en `/metrics`.
-2. `GET /metrics/workload?employee_id=X` → `workload_pct = (horas_pendientes / 40h) × 100`. Estado: `sobrecargado` (>120 %), `normal` (70–120 %), `subcargado` (<70 %).
-3. `GET /metrics/wip?employee_id=X` → número de tareas abiertas asignadas. Umbrales: óptimo ≤3, aceptable ≤5, sobrecargado >5.
-4. Gauge de workload %, barras de horas, badge de estado y recomendación textual de WIP.
 
-**Relaciones:** `<<include>>` CU-01. Empleado requerido. Accesible desde CU-03 (vista equipo), CU-05 (KPI de WIP y workload).
+1. El actor navega a `/metrics` y selecciona un empleado.
+2. *(Condición: “Workload” seleccionada)* El sistema ejecuta `GET /metrics/workload?employee_id=X&detailed=false&root_only=false`.
+3. El sistema calcula `workload_pct = (horas_pendientes / 40h) × 100` y deriva el estado:
+   - `sobrecargado` si `workload_pct > 120%`
+   - `normal` si `70% ≤ workload_pct ≤ 120%`
+   - `subcargado` si `workload_pct < 70%`
+4. Se muestra: gauge de workload %, barras de horas y badge de estado.
+
+**Flujos alternativos:**
+- `FA-01`: Empleado fuera de alcance (Responsable) → HTTP 403.
+- `FA-02`: Sin tareas pendientes → `pending_hours = 0`, estado `without_tasks` (cuando aplica en dashboards) o `subcargado`/0% en vista métrica.
+
+**Relaciones:** Accesible desde `/metrics`. *(Además, su resultado se reutiliza en dashboards mediante `GET /dashboards/summary/employee/{id}` y `GET /dashboards/summary/manager`.)*
+
+---
+
+## CU-14 – Consultar WIP (Work In Progress) de Empleado
+
+| Campo             | Valor                                                                        |
+| ----------------- | ---------------------------------------------------------------------------- |
+| **Actores**       | Director, Responsable                                                        |
+| **Precondición**  | CU-01. Empleado seleccionado.                                                |
+| **Postcondición** | El actor identifica el nivel de paralelismo de tareas abiertas del empleado. |
+
+**Flujo principal:**
+
+1. El actor selecciona un empleado en `/metrics`.
+2. `GET /metrics/wip?employee_id=X` → número de tareas abiertas asignadas.
+
+   * Umbrales: óptimo ≤3, aceptable ≤5, sobrecargado >5.
+3. Se muestra: badge de estado y recomendación textual sobre WIP.
+
+**Relaciones:** Accesible desde `/metrics`.
 
 ---
 
@@ -323,7 +356,7 @@
 2. `GET /metrics/risk-index?project_id=X` → `risk = (en_riesgo / abiertas) × 100`. Una tarea está en riesgo si: está vencida, o ha consumido ≥80 % del plazo desde `date_assign`.
 3. Doughnut chart (en riesgo vs en plazo), KPIs y semáforo bajo/medio/alto.
 
-**Relaciones:** `<<include>>` CU-01. Accesible desde CU-09 (badge de riesgo en resumen de proyecto).
+**Relaciones:** Accesible desde `/metrics`.
 
 ---
 
@@ -339,7 +372,7 @@
 1. `GET /metrics/rework-rate` (filtros: `project_id`, `employee_id`) → análisis de cambios de etapa en `mail_tracking_value`; una tarea reabierta es la que pasa de etapa cerrada a etapa abierta.
 2. `rework_rate = (reabiertos / cerradas_total) × 100`. Semáforo: <8 % verde, 8–15 % naranja, >15 % rojo.
 
-**Relaciones:** `<<include>>` CU-01. Visible en CU-02 (panel de salud) y CU-03 (alertas operativas).
+**Relaciones:** `<<include>>` desde CU-02 (panel de salud en `/overview`).
 
 ---
 
@@ -356,7 +389,7 @@
 2. Sesgo: `subestima` (>110 %), `sobreestima` (<90 %), `preciso` (90–110 %).
 3. Gauge, badge de sesgo con color, ratio promedio, total tareas y mensaje contextual.
 
-**Relaciones:** `<<include>>` CU-01.
+**Relaciones:** Accesible desde `/metrics`.
 
 ---
 
@@ -377,7 +410,7 @@
 **Flujos alternativos:**
 - `FA-01`: Sin tareas cerradas → valor a N/A con mensaje "No hay datos".
 
-**Relaciones:** `<<include>>` CU-01. Visible en CU-02 (panel de salud) y CU-03 (radar de salud).
+**Relaciones:** `<<include>>` desde CU-02 (panel de salud en `/overview`).
 
 ---
 
@@ -397,7 +430,7 @@
 **Flujos alternativos:**
 - `FA-01`: Sin datos de tracking → tabla vacía.
 
-**Relaciones:** `<<include>>` CU-01.
+**Relaciones:** Accesible desde `/metrics`.
 
 ---
 
@@ -417,7 +450,7 @@
 **Flujos alternativos:**
 - `FA-01`: Sin tareas → canceladas 0 %.
 
-**Relaciones:** `<<include>>` CU-01.
+**Relaciones:** Accesible desde `/metrics`.
 
 ---
 
@@ -437,7 +470,7 @@
 **Flujos alternativos:**
 - `FA-01`: Sin tareas clasificadas → gráfico vacío.
 
-**Relaciones:** `<<include>>` CU-01.
+**Relaciones:** Accesible desde `/metrics`.
 
 ---
 
@@ -451,14 +484,14 @@
 
 **Flujo principal:**
 1. El actor navega a `/graficos`. Selecciona rango de fechas y opcionalmente filtra por empleado, departamento o proyecto.
-2. Se cargan en paralelo: `GET /charts/task-evolution` (líneas, semana/mes), `/charts/task-distribution` (donut), `/metrics/client-distribution` (barras horizontal), `/charts/workload-by-dept` (barras vertical).
-3. Cuatro gráficos renderizados con Recharts. El actor puede cambiar la agrupación temporal semana/mes.
+2. Se cargan datos base y gráficos: `GET /employees/`, `GET /departments/`, `GET /projects/`, `GET /charts/task-evolution?date_from=...&date_to=...&group_by=month`, `GET /charts/task-distribution?date_from=...&date_to=...`, `GET /metrics/client-distribution?date_from=...&date_to=...`.
+3. El actor puede cambiar la agrupación temporal semana/mes y aplicar filtros (empleado/departamento/proyecto), refrescando el endpoint de evolución. La distribución por estado y la distribución por cliente se recalculan según el rango de fechas.
 
 **Flujos alternativos:**
 - `FA-01`: Sin datos → cada gráfico muestra "Sin datos en el período".
 - `FA-02`: El Responsable no ve `client-distribution`; los demás filtran por su alcance.
 
-**Relaciones:** `<<include>>` CU-01.
+**Relaciones:** `<<include>>` CU-04 (lista de empleados para filtro), `<<include>>` CU-06 (lista de departamentos para filtro), `<<include>>` CU-08 (lista de proyectos para filtro). Navega a CU-09.
 
 ---
 
@@ -471,13 +504,13 @@
 | **Postcondición** | El actor detecta discrepancias entre presencia física e imputaciones en partes analíticos. |
 
 **Flujo principal:**
-1. El actor navega a `/asistencia`. Selecciona rango (por defecto: mes actual). Modo Equipo o Por Responsable (Director).
-2. `GET /employees/attendance/comparison` → tabla por empleado con horas fichadas, imputadas, diferencia y `coverage_pct = (imputadas/fichadas)×100` con badge (OK ≥95 %, Revisar ≥80 %, Alerta <80 %).
-3. 4 KPIs globales + gráfico de barras agrupadas (top 15 por fichadas).
-4. Click en empleado → `GET /employees/attendance/{id}/daily` → serie diaria con barras agrupadas (fichadas/imputadas) y gráfico de línea de diferencia.
-5. **Modo Por Responsable** _(Director)_: `GET /employees/attendance/manager/{id}` → equipo del responsable con CTE recursivo.
+1. El actor navega a `/asistencia`. Rango por defecto: **mes actual**.
+2. El sistema carga: `GET /employees/managers/list`, `GET /employees/attendance/comparison?date_from=...&date_to=...`, `GET /employees/?page_size=200`, `GET /departments/`.
+3. Se renderiza tabla por empleado con horas fichadas, imputadas, diferencia y `coverage_pct = (imputadas/fichadas)×100` con badge (OK ≥95 %, Revisar ≥80 %, Alerta <80 %).
+4. **Opcional (modo Por Responsable):** al cambiar el modo se llama a `GET /employees/attendance/manager/{id}?date_from=...&date_to=...`.
+5. **Opcional (detalle diario):** al seleccionar un empleado se llama a `GET /employees/attendance/{id}/daily?date_from=...&date_to=...` y se muestra el gráfico en la propia página.
 
-**Relaciones:** `<<include>>` CU-01.
+**Relaciones:** `<<include>>` CU-04 (lista de empleados para filtro), `<<include>>` CU-06 (lista de departamentos para filtro). *(Opcional: modo “Por Responsable” usa `GET /employees/attendance/manager/{id}`.)*
 
 ---
 
@@ -497,13 +530,13 @@
 5. Tabla de proyectos (`/metrics/profitability/per-project`) con income, expense, net, horas y badge.
 6. Tabla de clientes (`/metrics/profitability/per-client`) como sub-flujo (equivalente al antiguo CU-22).
 7. Drill-down por responsable: seleccionar manager → botón "Ver detalle" → `/metrics/profitability/manager/{id}` → vista individual con sus proyectos.
-8. Panel **Estado del equipo** (sub-flujo equivalente a CU-06 antiguo): `GET /dashboards/team-assignment` → tabla con carga actual de cada empleado para facilitar asignaciones. Filtrable por proyecto.
+8. *(Opcional / WIP de documentación)* Panel **Estado del equipo**: actualmente no existe el endpoint `GET /dashboards/team-assignment` en backend; el estado del equipo se obtiene desde `GET /dashboards/summary/manager` (CU-03).
 
 **Flujos alternativos:**
 - `FA-01`: Sin partes analíticos en el período → todo a 0.
 - `FA-02`: Un Responsable intenta acceder → HTTP 403, pantalla "Acceso restringido".
 
-**Relaciones:** `<<include>>` CU-01. `<<extend>>` CU-10 (estado equipo/tareas).
+**Relaciones:** *(este CU es base de extensión)* `<<extend>>` por CU-26/27 (drill-down de líneas por proyecto/cliente) y vista por responsable (selección de manager → `/metrics/profitability/manager/{id}`).
 
 ---
 
@@ -524,7 +557,7 @@
 **Flujos alternativos:**
 - `FA-01`: Sin líneas → tablas vacías.
 
-**Relaciones:** `<<include>>` CU-01. `<<extend>>` desde CU-24.
+**Relaciones:** `<<extend>>` desde CU-24.
 
 ---
 
@@ -545,7 +578,7 @@
 **Flujos alternativos:**
 - `FA-01`: Cliente sin proyectos con líneas → tablas vacías.
 
-**Relaciones:** `<<include>>` CU-01. `<<extend>>` desde CU-24.
+**Relaciones:** `<<extend>>` desde CU-24.
 
 ---
 
@@ -565,7 +598,7 @@
 5. Click en tarea → CU-11; en proyecto → CU-09; en empleado → CU-05.
 6. El Responsable recibe resultados filtrados por su alcance.
 
-**Relaciones:** `<<include>>` CU-01. Navega a CU-05, CU-09, CU-11.
+**Relaciones:** Navega a CU-05, CU-09, CU-11.
 
 ---
 

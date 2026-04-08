@@ -32,12 +32,12 @@ El sistema es una aplicación web progresiva (PWA) pensada para funcionar direct
 
 ## Diagrama de Objetos
 
-![Diagrama de Objetos]()
+![Diagrama de Objetos](/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaObjetos.svg)
 
 ## Diagrama de Estados
 
 ![Diagrama de Estados 1](/Estudiantes/daniel-puente/Capitulo%202/imagenes/EstadosComanda.svg)
-![Diagrama de Estados 2](/Estudiantes/daniel-puente/Capitulo%202/imagenes/EstadosMesa.svg)
+![Diagrama de Estados 2](/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaEstadosMesa.svg)
 ![Diagrama de Estados 3](/Estudiantes/daniel-puente/Capitulo%202/imagenes/EstadosReserva.png)
 
 ## Requisitos Funcionales

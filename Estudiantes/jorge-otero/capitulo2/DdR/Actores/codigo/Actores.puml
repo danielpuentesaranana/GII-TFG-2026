@@ -5,8 +5,6 @@ left to right direction
 actor Cliente
 actor Tecnico
 
-Cliente -right-> Tecnico : envia solicitud
-
 note right of Cliente
 **Cliente**:
 Inicia el ciclo mediante solicitudes
@@ -15,7 +13,8 @@ end note
 
 note right of Tecnico
 **Tecnico**:
-Recibe solicitudes y las resuelve
+Se encarga de ver los formularios 
+pendientes y resolverlos
 end note
 
 @enduml

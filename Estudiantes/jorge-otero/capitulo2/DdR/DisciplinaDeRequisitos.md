@@ -63,3 +63,37 @@ Finalmente, el cliente recibe y revisa la respuesta. En caso de necesitar aporta
 
 ### Caso de Uso - Ver Solicitudes Pendientes
 
+| Diagrama | Código |
+|---------|---------|
+|![CdU](./Detallar_CdU/imagen/VerSolicitudesPendientes.png)|[Ver código](./Detallar_CdU/codigo/VerSolicitudesPendientes.puml)|
+
+Este caso de uso describe el proceso mediante el cual el técnico accede y consulta las solicitudes pendientes en el sistema.
+
+El flujo comienza cuando el técnico accede a la vista correspondiente. El sistema recupera la información disponible y la presenta al técnico, quien puede revisar el estado y contenido de las solicitudes.
+
+En caso de producirse un error en la carga de la información, el sistema no podrá mostrar las solicitudes.
+
+### Caso de Uso - Actualizar Estado
+
+| Diagrama | Código |
+|---------|---------|
+|![CdU](./Detallar_CdU/imagen/ActualizarEstado.png)|[Ver código](./Detallar_CdU/codigo/ActualizarEstado.puml)|
+
+Este caso de uso describe el proceso mediante el cual el técnico actualiza el estado de una solicitud en el sistema.
+
+El flujo comienza cuando el técnico selecciona una solicitud pendiente y la marca como resuelta. A continuación, el sistema verifica si existe un formulario asociado a dicha solicitud. En caso de existir, el sistema registra el nuevo estado. Si no existe formulario, el proceso finaliza sin realizar ninguna modificación.
+
+Este comportamiento garantiza la coherencia de los datos y evita cambios innecesarios en el sistema.
+
+### Caso de Uso - Completar Formulario
+
+| Diagrama | Código |
+|---------|---------|
+|![CdU](./Detallar_CdU/imagen/CompletarFormulario.png)|[Ver código](./Detallar_CdU/codigo/CompletarFormulario.puml)|
+
+Este caso de uso describe el proceso mediante el cual el cliente aporta información adicional a través de un formulario.
+
+El flujo comienza cuando el cliente accede al formulario y completa los campos requeridos. A continuación, revisa la información introducida antes de enviarla. Si está conforme, el formulario es enviado al sistema. En caso contrario, puede modificar los datos antes de realizar el envío.
+
+Este proceso permite complementar la información de una solicitud previa de forma estructurada y controlada.
+

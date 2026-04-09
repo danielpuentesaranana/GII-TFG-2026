@@ -40,13 +40,7 @@ end note
 }
 
 enviarSolicitud -[#green]-> SISTEMA
-note on link
-Sistema
-end note
 
 enviarSolicitud -[#red]-> ERROR_ENVIO
-note on link
-Error al enviar la solicitud
-end note
 
 @enduml

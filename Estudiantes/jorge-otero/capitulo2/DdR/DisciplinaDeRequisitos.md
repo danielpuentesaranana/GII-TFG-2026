@@ -49,6 +49,13 @@ Antes de enviarla, el cliente revisa su contenido para comprobar que la informac
 
 Este proceso garantiza que las solicitudes recibidas tengan un mínimo nivel de calidad y coherencia, facilitando su posterior procesamiento.
 
+**Criterios de Aceptación**
++ El cliente puede redactar una solicitud con la información necesaria.
++ El cliente puede modificar la solicitud antes de enviarla.
++ El sistema permite el envío únicamente cuando la solicitud contiene información válida.
++ La solicitud queda registrada en el sistema tras su envío.
++ El sistema confirma la recepción de la solicitud al cliente.
+
 ### Caso de Uso - Recibir Respuesta
 
 | Diagrama | Código |
@@ -60,6 +67,14 @@ Este caso de uso describe el proceso mediante el cual el cliente recibe una resp
 El flujo comienza con el cliente en espera de una respuesta. A continuación, el sistema procesa la solicitud previamente enviada y genera una respuesta, que es posteriormente enviada al cliente.
 
 Finalmente, el cliente recibe y revisa la respuesta. En caso de necesitar aportar información adicional, podrá iniciar un nuevo caso de uso independiente mediante el formulario.
+
+**Criterios de aceptación**
+
++ El sistema procesa la solicitud previamente enviada por el cliente.
++ El sistema genera una respuesta adecuada en función de la solicitud.
++ La respuesta es enviada correctamente al cliente.
++ El cliente puede recibir y visualizar la respuesta.
++ El cliente puede iniciar un nuevo proceso en caso de requerir aportar información adicional.
 
 ### Caso de Uso - Ver Solicitudes Pendientes
 
@@ -73,6 +88,14 @@ El flujo comienza cuando el técnico accede a la vista correspondiente. El siste
 
 En caso de producirse un error en la carga de la información, el sistema no podrá mostrar las solicitudes.
 
+**Criterios de aceptación**
+
++ El técnico puede acceder a la vista de solicitudes pendientes.
++ El sistema muestra correctamente las solicitudes no resueltas.
++ La información presentada incluye los datos necesarios para su revisión.
++ El sistema gestiona errores en la carga de datos mostrando un mensaje adecuado.
++ Las solicitudes se muestran actualizadas en el momento de la consulta.
+
 ### Caso de Uso - Actualizar Estado
 
 | Diagrama | Código |
@@ -85,6 +108,14 @@ El flujo comienza cuando el técnico selecciona una solicitud pendiente y la mar
 
 Este comportamiento garantiza la coherencia de los datos y evita cambios innecesarios en el sistema.
 
+**Criterios de aceptación**
+
++ El técnico puede marcar la solicitud como resuelta.
++ El sistema verifica la existencia de un formulario asociado.
++ Si el formulario existe, el estado de la solicitud se actualiza correctamente.
++ Si no existe formulario, el sistema no realiza cambios en el estado.
++ El sistema refleja el estado actualizado de forma correcta tras la operación.
+
 ### Caso de Uso - Completar Formulario
 
 | Diagrama | Código |
@@ -96,6 +127,15 @@ Este caso de uso describe el proceso mediante el cual el cliente aporta informac
 El flujo comienza cuando el cliente accede al formulario y completa los campos requeridos. A continuación, revisa la información introducida antes de enviarla. Si está conforme, el formulario es enviado al sistema. En caso contrario, puede modificar los datos antes de realizar el envío.
 
 Este proceso permite complementar la información de una solicitud previa de forma estructurada y controlada.
+
+**Criterios de aceptación**
+
++ El cliente puede crear un formulario para detallar su solicitud.
++ El cliente puede completar los campos requeridos del formulario.
++ El cliente puede revisar y modificar la información antes de enviarla.
++ El sistema valida que los campos obligatorios estén cumplimentados.
++ El formulario es enviado correctamente al sistema.
++ La información adicional queda registrada y asociada a la solicitud correspondiente.
 
 ## Prototipar Casos de Uso 
 

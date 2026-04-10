@@ -1061,8 +1061,7 @@ Permite crear una nueva sesion de trabajo para iniciar un contexto independiente
 **Flujo principal:**
 1. El actor solicita crear una nueva sesion.
 2. El sistema solicita los datos basicos de identificacion.
-3. El actor introduce la informacion de la sesion.
-4. El sistema registra y activa la nueva sesion.
+3. El sistema registra y activa la nueva sesion.
 
 **Casos de Error:**
 - E1. Datos incompletos

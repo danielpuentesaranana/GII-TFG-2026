@@ -190,6 +190,7 @@ Ambos actores comparten la mayoría de los casos de uso, pero el Director tiene 
 | CU-21 | Gráficos Analíticos | 2 | 3 | 2 | 2 | **Media** |
 | CU-22 | Asistencia vs Imputaciones | 2 | 3 | 2 | 2 | **Media** |
 | CU-26 | Búsqueda Global | 1 | 2 | 3 | 1 | **Media** |
+| CU-27 | Cerrar Sesión | 1 | 1 | 3 | 1 | **Media** |
 
 #### Prioridad Baja
 

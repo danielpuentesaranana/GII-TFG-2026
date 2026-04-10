@@ -35,7 +35,9 @@ actor Responsable as R
 '── Autenticación ──────────────────────────────
 package "Autenticación" {
   usecase "CU-01\nAutenticarse en el Sistema" as CU01
+  usecase "CU-27\nCerrar Sesión" as CU27
 }
+
 
 '── Empleados ──────────────────────────────────
 package "Empleados  [scope]" {
@@ -83,6 +85,7 @@ package "Utilidades" {
 
 '══ Actor → secciones ═══════════════════════════
 R -down-> CU01 : inicia sesión con\nusuario y contraseña
+R -down-> CU27 : cierra su sesión\nactiva
 R --> CU02 : navega a la lista\nde empleados
 R --> CU04 : navega a la lista\nde departamentos
 R --> CU06 : navega a la lista\nde proyectos

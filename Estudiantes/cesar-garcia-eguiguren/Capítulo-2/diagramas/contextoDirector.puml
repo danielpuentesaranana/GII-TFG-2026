@@ -35,6 +35,7 @@ actor Director as D
 '── Autenticación ──────────────────────────────
 package "Autenticación" {
   usecase "CU-01\nAutenticarse en el Sistema" as CU01
+  usecase "CU-27\nCerrar Sesión" as CU27
 }
 
 '── Empleados ──────────────────────────────────
@@ -90,6 +91,7 @@ package "Utilidades" {
 
 '══ Actor → secciones ═══════════════════════════
 D -down-> CU01 : inicia sesión con\nusuario y contraseña
+D -down-> CU27 : cierra su sesión\nactiva
 D --> CU02 : navega a la lista\nde empleados
 D --> CU04 : navega a la lista\nde departamentos
 D --> CU06 : navega a la lista\nde proyectos

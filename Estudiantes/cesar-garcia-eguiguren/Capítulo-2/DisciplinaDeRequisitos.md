@@ -59,6 +59,7 @@ A continuación se presenta la lista completa de los 24 casos de uso identificad
 | ID | Nombre | Actor(es) |
 |---|---|---|
 | CU-01 | Autenticarse en el Sistema | Director, Responsable |
+| CU-27 | Cerrar Sesión | Director, Responsable |
 
 #### Paquete 2 – Entidad: Empleado
 
@@ -110,6 +111,7 @@ A continuación se presenta la lista completa de los 24 casos de uso identificad
 |---|---|---|---|
 | CU-21 | Visualizar Gráficos Analíticos | Director, Responsable | Tres gráficos interactivos: evolución de tareas, distribución por estado y horas por cliente (solo Director). |
 | CU-22 | Consultar Asistencia vs Imputaciones | Director, Responsable | Comparativa fichadas (`hr_attendance`) vs imputadas (`account_analytic_line`) con serie diaria por empleado. |
+
 
 #### Paquete 8 – Rentabilidad Financiera _(exclusivo para el director)_
 

@@ -606,3 +606,15 @@
 - `FA-01`: Sin resultados → estado vacío.
 
 **Relaciones:** Navega a CU-03, CU-07, CU-09.
+
+### CU-27 – Cerrar Sesión
+| Campo | Valor |
+|---|---|
+| **Actores** | Director, Responsable |
+| **Precondición** | CU-01. Usuario autenticado. |
+| **Postcondición** | JWT eliminado, cabecera de autenticación limpia, redirigido a login. |
+
+**Flujo principal:**
+1. El actor hace click en "Cerrar Sesión" en el menú de usuario.
+2. El frontend elimina el JWT de `localStorage` y limpia la cabecera `Authorization` de Axios.
+3. Redirige a `/login`.

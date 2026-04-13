@@ -26,7 +26,7 @@ rectangle "Netkia Analytics\nMódulo externo sobre Odoo v16" as System #3A3A3A {
 
   rectangle "P6 · Métricas operativas (CU-10/20)\nProductividad · Riesgo · Lead time · WIP · Workload · ..." as P7 #927410
 
-  rectangle "P7 · Análisis visual y asistencia (CU-22, CU-23)" as P8 #927410
+  rectangle "P7 · Análisis visual, asistencia/carga (CU-22, CU-23, CU-28)" as P8 #927410
 
   rectangle "P8 · Rentabilidad financiera (CU-23, CU-24, CU-25)\n★ Exclusivo Director · HTTP 403 para Responsable" as P9 #4B3FA6
 

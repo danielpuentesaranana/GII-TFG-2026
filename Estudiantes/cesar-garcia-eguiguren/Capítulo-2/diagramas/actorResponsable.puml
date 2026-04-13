@@ -27,6 +27,7 @@ usecase "CU-17 Consultar Métrica de Lead Time" as CU17
 usecase "CU-18 Consultar Tiempo de Permanencia por Estado" as CU18
 usecase "CU-19 Consultar Métrica de Tareas Canceladas" as CU19
 usecase "CU-20 Consultar Tiempo Invertido por Prioridad" as CU20
+usecase "CU-28 Consultar Distribución de Carga del Equipo\n[scope]" as CU28
 
 usecase "CU-21 Visualizar Gráficos Analíticos\n[scope]" as CU21
 usecase "CU-22 Analizar Asistencia vs Imputaciones\n[solo modo Equipo]" as CU22
@@ -55,7 +56,7 @@ R --> CU17
 R --> CU18
 R --> CU19
 R --> CU20
-
+R --> CU28
 R --> CU21
 R --> CU22
 R --> CU26

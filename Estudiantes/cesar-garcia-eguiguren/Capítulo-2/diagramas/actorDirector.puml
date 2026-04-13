@@ -30,6 +30,7 @@ usecase "CU-20 Consultar Tiempo Invertido por Prioridad" as CU20
 
 usecase "CU-21 Visualizar Gráficos Analíticos" as CU21
 usecase "CU-22 Analizar Asistencia vs Imputaciones de Horas" as CU22
+usecase "CU-28 Consultar Distribución de Carga del Equipo" as CU28
 
 usecase "CU-23 Analizar Rentabilidad Financiera" as CU23
 usecase "CU-24 Consultar Líneas Analíticas de Proyecto" as CU24
@@ -60,7 +61,7 @@ D --> CU17
 D --> CU18
 D --> CU19
 D --> CU20
-
+D --> CU28
 D --> CU21
 D --> CU22
 D --> CU23

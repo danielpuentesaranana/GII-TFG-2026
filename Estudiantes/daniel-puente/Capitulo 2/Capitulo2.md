@@ -199,12 +199,12 @@ En esta sección se detallan los casos de uso que conforman el flujo principal d
 
 | ID | Caso de uso | Camarero | Administrador | Cocinero | Sist. Notif. |
 |---|---|:---:|:---:|:---:|:---:|
-| CU-N01 | Acceso denegado por credenciales incorrectas | ✅ | ✅ | ✅ | |
-| CU-N02 | Operación bloqueada por rol insuficiente | ✅ | | ✅ | |
-| CU-N03 | Comanda rechazada por alérgenos incompletos | ✅ | ✅ | | |
-| CU-N04 | Reserva rechazada por conflicto de horario | | ✅ | | |
-| CU-N05 | Edición bloqueada de línea en preparación | ✅ | ✅ | | |
-| CU-N06 | Ticket rechazado por mesa ya cobrada | ✅ | | | |
+| CU-N01 | Denegar acceso por credenciales incorrectas | ✅ | ✅ | ✅ | |
+| CU-N02 | Bloquear operación por rol insuficiente | ✅ | | ✅ | |
+| CU-N03 | Rechazar comanda por alérgenos incompletos | ✅ | ✅ | | |
+| CU-N04 | Rechazar reserva por conflicto de horario | | ✅ | | |
+| CU-N05 | Bloquear edición de línea en preparación | ✅ | ✅ | | |
+| CU-N06 | Rechazar ticket por mesa ya cobrada | ✅ | | | |
 | CU-N07 | Restringir pedido por falta de stock | ✅ | | | ✅ |
 | CU-N08 | Anular ticket ya cobrado por error de cobro | | ✅ | | |
 | CU-N09 | Marcar reserva como no presentado | | ✅ | | |
@@ -225,7 +225,10 @@ En esta sección se detallan los casos de uso que conforman el flujo principal d
 ![CDU-SistNoti](/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-NotificacionesAuto.svg)
 
 ### Casos de Uso Negativos
-![CDU-Negativos](/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Negativos.svg)
+![CDU-Negativos](/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Negativos.svg) 
+
+## Diagrama de Secuencia
+![Secuencia](/Estudiantes/daniel-puente/Capitulo%202/imagenes/Secuencia.svg) 
 
 
 ## Priorización MoSCoW
@@ -253,17 +256,17 @@ En esta sección se detallan los casos de uso que conforman el flujo principal d
 | **CU-21** | Gestionar usuarios y roles | 🔴 Must |
 | **CU-25** | Gestionar carta (Añadir, Editar, Eliminar platos) | 🔴 Must |
 | **CU-27** | Enviar notificaciones automáticas | 🔴 Must |
-| **CU-N01** | Acceso denegado por credenciales incorrectas | 🔴 Must |
-| **CU-N02** | Operación bloqueada por rol insuficiente | 🔴 Must |
-| **CU-N03** | Comanda rechazada por alérgenos incompletos | 🔴 Must |
-| **CU-N05** | Edición bloqueada de línea en preparación | 🔴 Must |
-| **CU-N06** | Ticket rechazado por mesa ya cobrada | 🔴 Must |
+| **CU-N01** | Denegar acceso por credenciales incorrectas  | 🔴 Must |
+| **CU-N02** | Bloquear operación por rol insuficiente | 🔴 Must |
+| **CU-N03** | Rechazar comanda por alérgenos incompletos | 🔴 Must |
+| **CU-N05** | Bloquear edición de línea en preparación | 🔴 Must |
+| **CU-N06** | Rechazar ticket por mesa ya cobrada | 🔴 Must |
 | **CU-15** | Editar ticket | 🟠 Should |
 | **CU-16** | Reclamar ticket enviado | 🟠 Should |
 | **CU-24** | Consultar log de auditoría | 🟠 Should |
 | **CU-26** | Configurar Menú del Día | 🟠 Should |
 | **CU-28** | Marcar plato como agotado / disponible | 🟠 Should |
-| **CU-N04** | Reserva rechazada por conflicto de horario | 🟠 Should |
+| **CU-N04** | Rechazar reserva por conflicto de horario | 🟠 Should |
 | **CU-N07** | Restringir pedido por falta de stock | 🟠 Should |
 | **CU-N10** | Desbloquear cuenta por intentos fallidos | 🟠 Should |
 | **CU-22** | Configurar plano de sala (Zonas y Mesas) | 🟡 Could |
@@ -283,17 +286,510 @@ Los 8 casos de uso Should son importantes para la calidad del servicio pero no b
 
 Los 4 casos de uso Could añaden valor al sistema pero no son críticos para el lanzamiento del MVP. Cubren funcionalidades avanzadas como la configuración del plano de sala, la unión y separación de mesas, la anulación de tickets cobrados por error y el registro de reservas no presentadas. Se abordarán si el tiempo de desarrollo lo permite.
 
+## Selección de Casos de Uso Para el Desarrollo
+
+| ID    | Nombre                | Priorización |
+|-------|-----------------------|:------------:|
+| CU-04 | Abrir mesa            | 🔴 Must      |
+| CU-06 | Tomar Comanda         | 🔴 Must      |
+| CU-08 | Editar Comanda        | 🔴 Must      |
+| CU-12 | Marcar plato como listo | 🔴 Must    |
+| CU-14 | Enviar ticket a caja  | 🔴 Must      |
+| CU-17 | Cobrar ticket en caja | 🔴 Must      |
+| CU-05 | Cerrar mesa           | 🔴 Must      |
+
 ## Detallar Casos de Uso
 
-## Prototipar Casos de Uso
+# Detallar Casos De Uso
 
-![Prototipo 1](/Estudiantes/daniel-puente/Capitulo%202/imagenes/Prototipos1.jpeg)
+## CU-01 — Iniciar sesión
 
+- **ID:** CU-01
+- **Nombre:** Iniciar sesión
+- **Actor/es:** Camarero, Administrador, Cocinero
+- **Prioridad:** Must
+- **Precondición:** El usuario tiene una cuenta activa en el sistema
+- **Postcondición:** El usuario accede a su pantalla principal según su rol
+
+**Flujo principal**
+1. El usuario abre la aplicación en su dispositivo.
+2. El sistema muestra el formulario de inicio de sesión.
+3. El usuario introduce su email y contraseña.
+4. El sistema valida las credenciales contra la base de datos.
+5. El sistema genera un access token JWT y un refresh token.
+6. El sistema redirige al usuario a su pantalla principal según su rol.
+
+**Flujos alternativos**
+- *CU-N01:* Si las credenciales son incorrectas, el sistema muestra un mensaje de error y no permite el acceso.
+- *CU-N10:* Si se producen 5 intentos fallidos consecutivos, el sistema bloquea la cuenta temporalmente.
+
+---
+
+## CU-02 — Cerrar sesión
+
+- **ID:** CU-02
+- **Nombre:** Cerrar sesión
+- **Actor/es:** Camarero, Administrador, Cocinero
+- **Prioridad:** Must
+- **Precondición:** El usuario tiene una sesión activa
+- **Postcondición:** La sesión queda invalidada y el usuario es redirigido al login
+
+**Flujo principal**
+1. El usuario pulsa el botón de cerrar sesión.
+2. El sistema invalida el access token y el refresh token.
+3. El sistema elimina los datos de sesión del dispositivo.
+4. El sistema redirige al usuario a la pantalla de inicio de sesión.
+
+---
+
+## CU-03 — Ver estado de mesas por zona
+
+- **ID:** CU-03
+- **Nombre:** Ver estado de mesas por zona
+- **Actor/es:** Camarero, Administrador
+- **Prioridad:** Must
+- **Precondición:** El usuario ha iniciado sesión
+- **Postcondición:** El usuario visualiza el plano de sala actualizado en tiempo real
+
+**Flujo principal**
+1. El usuario accede a la pantalla principal de sala.
+2. El sistema muestra todas las zonas configuradas (comedor, bar, terraza, etc.).
+3. Cada mesa se muestra con su estado actual: libre, ocupada o reservada.
+4. El sistema actualiza el estado automáticamente vía WebSocket ante cualquier cambio.
+
+---
+
+## CU-04 — Abrir mesa
+
+- **ID:** CU-04
+- **Nombre:** Abrir mesa
+- **Actor/es:** Camarero, Administrador
+- **Prioridad:** Must
+- **Precondición:** La mesa está en estado libre
+- **Postcondición:** La mesa pasa a estado ocupada y queda lista para recibir comandas
+
+**Flujo principal**
+1. El usuario selecciona una mesa libre en el plano de sala.
+2. El sistema solicita confirmación para abrir la mesa.
+3. El usuario confirma.
+4. El sistema registra la apertura con usuario y timestamp.
+5. La mesa pasa a estado ocupada y se actualiza el plano en tiempo real.
+
+---
+
+## CU-05 — Cerrar mesa
+
+- **ID:** CU-05
+- **Nombre:** Cerrar mesa
+- **Actor/es:** Administrador
+- **Prioridad:** Must
+- **Precondición:** La mesa está ocupada y el ticket ha sido cobrado
+- **Postcondición:** La mesa pasa a estado libre y queda disponible para nuevos comensales
+
+**Flujo principal**
+1. El Administrador selecciona una mesa ocupada en el plano.
+2. El sistema verifica que el ticket asociado ha sido cobrado.
+3. El sistema registra el cierre con usuario y timestamp en el log de auditoría.
+4. La mesa pasa a estado libre y se actualiza el plano en tiempo real.
+
+---
+
+## CU-06 — Tomar comanda
+
+- **ID:** CU-06
+- **Nombre:** Tomar comanda
+- **Actor/es:** Camarero, Administrador
+- **Prioridad:** Must
+- **Precondición:** La mesa está en estado ocupada
+- **Postcondición:** La comanda queda registrada y enviada a cocina
+
+**Flujo principal**
+1. El usuario selecciona una mesa ocupada.
+2. El sistema muestra la carta y el menú del día disponible.
+3. El usuario añade platos línea a línea, indicando cantidad, alérgenos y observaciones.
+4. El sistema valida que todos los campos obligatorios estén completos.
+5. El usuario confirma el envío de la comanda.
+6. El sistema guarda la comanda y la envía al KDS de cocina vía WebSocket.
+7. Si no hay conexión, la comanda se guarda en IndexedDB y se sincroniza al recuperar la red.
+
+**Flujos alternativos**
+- *CU-N03:* Si los alérgenos están incompletos, el sistema bloquea el envío y avisa al usuario.
+- *CU-N07:* Si algún plato está marcado como agotado, el sistema impide añadirlo a la comanda.
+
+---
+
+## CU-07 — Ver comanda de una mesa
+
+- **ID:** CU-07
+- **Nombre:** Ver comanda de una mesa
+- **Actor/es:** Camarero, Administrador
+- **Prioridad:** Must
+- **Precondición:** La mesa está ocupada y tiene una comanda activa
+- **Postcondición:** El usuario visualiza el detalle completo de la comanda
+
+**Flujo principal**
+1. El usuario selecciona una mesa ocupada.
+2. El sistema muestra el detalle de la comanda activa: platos, cantidades, alérgenos, observaciones y estado de cada línea.
+
+---
+
+## CU-08 — Editar comanda
+
+- **ID:** CU-08
+- **Nombre:** Editar comanda
+- **Actor/es:** Camarero, Administrador
+- **Prioridad:** Must
+- **Precondición:** La mesa tiene una comanda activa con líneas en estado pendiente
+- **Postcondición:** La comanda queda actualizada y los cambios se reflejan en el KDS
+
+**Flujo principal**
+1. El usuario accede a la comanda activa de una mesa.
+2. El usuario modifica, añade o elimina líneas en estado pendiente.
+3. El sistema valida los cambios (alérgenos, disponibilidad).
+4. El sistema guarda los cambios, actualiza el KDS en tiempo real y registra la edición en el log de auditoría.
+
+**Flujos alternativos**
+- *CU-N05:* Si el usuario intenta editar una línea ya en preparación o lista, el sistema bloquea la acción.
+
+---
+
+## CU-09 — Solicitar segundos platos / postres
+
+- **ID:** CU-09
+- **Nombre:** Solicitar segundos platos / postres
+- **Actor/es:** Camarero, Administrador, Sistema de Notificaciones
+- **Prioridad:** Must
+- **Precondición:** Los primeros platos de la mesa han sido marcados como listos por cocina
+- **Postcondición:** La solicitud llega a cocina y aparece en el KDS
+
+**Flujo principal**
+1. El sistema detecta que los primeros platos de una mesa están listos.
+2. El camarero recibe una notificación automática en su dispositivo.
+3. El camarero pulsa "Solicitar segundos" desde la comanda de la mesa.
+4. El sistema envía la solicitud a cocina vía WebSocket y actualiza el KDS.
+
+---
+
+## CU-10 — Ver comandas pendientes en KDS
+
+- **ID:** CU-10
+- **Nombre:** Ver comandas pendientes en KDS
+- **Actor/es:** Cocinero
+- **Prioridad:** Must
+- **Precondición:** El cocinero ha iniciado sesión
+- **Postcondición:** El cocinero visualiza todas las comandas pendientes en tiempo real
+
+**Flujo principal**
+1. El cocinero accede a la pantalla KDS.
+2. El sistema muestra todas las comandas pendientes ordenadas por hora de llegada.
+3. Cada comanda muestra mesa, zona, platos, cantidades, alérgenos y observaciones destacadas visualmente.
+4. El KDS se actualiza automáticamente en tiempo real vía WebSocket ante nuevas comandas o ediciones.
+
+---
+
+## CU-11 — Marcar comanda en preparación
+
+- **ID:** CU-11
+- **Nombre:** Marcar comanda en preparación
+- **Actor/es:** Cocinero
+- **Prioridad:** Must
+- **Precondición:** Existe al menos una comanda en estado pendiente en el KDS
+- **Postcondición:** La comanda pasa a estado en preparación y queda bloqueada para edición
+
+**Flujo principal**
+1. El cocinero selecciona una comanda pendiente en el KDS.
+2. El cocinero pulsa "En preparación".
+3. El sistema actualiza el estado de la comanda y lo notifica al camarero vía WebSocket.
+4. Las líneas de esa comanda quedan bloqueadas para cualquier edición desde sala.
+
+---
+
+## CU-12 — Marcar plato como listo
+
+- **ID:** CU-12
+- **Nombre:** Marcar plato como listo
+- **Actor/es:** Cocinero, Sistema de Notificaciones
+- **Prioridad:** Must
+- **Precondición:** El plato está en estado en preparación
+- **Postcondición:** El plato pasa a estado listo y el camarero recibe una notificación automática
+
+**Flujo principal**
+1. El cocinero selecciona un plato en preparación en el KDS.
+2. El cocinero pulsa "Listo".
+3. El sistema actualiza el estado del plato.
+4. El Sistema de Notificaciones envía un aviso automático al camarero correspondiente vía WebSocket.
+
+---
+
+## CU-13 — Ver alérgenos y observaciones
+
+- **ID:** CU-13
+- **Nombre:** Ver alérgenos y observaciones
+- **Actor/es:** Cocinero
+- **Prioridad:** Must
+- **Precondición:** Existe una comanda activa con alérgenos u observaciones registradas
+- **Postcondición:** El cocinero visualiza los alérgenos y observaciones con indicador visual destacado
+
+**Flujo principal**
+1. El cocinero accede al detalle de una comanda en el KDS.
+2. El sistema muestra cada línea con sus alérgenos e indicador visual destacado.
+3. Las observaciones especiales aparecen resaltadas junto al plato correspondiente.
+
+---
+
+## CU-14 — Enviar ticket a caja
+
+- **ID:** CU-14
+- **Nombre:** Enviar ticket a caja
+- **Actor/es:** Camarero, Administrador
+- **Prioridad:** Must
+- **Precondición:** La mesa tiene una comanda activa
+- **Postcondición:** El ticket queda generado en caja con el desglose completo
+
+**Flujo principal**
+1. El usuario selecciona la mesa y pulsa "Enviar a caja".
+2. El sistema genera el ticket con desglose de platos, precios y total.
+3. El ticket incluye: camarero, mesa, zona y timestamp.
+4. El sistema registra el envío en el log de auditoría.
+5. El ticket queda disponible en caja para ser cobrado por el Administrador.
+
+**Flujos alternativos**
+- *CU-N06:* Si la mesa ya ha sido cobrada, el sistema rechaza el envío y muestra un aviso.
+
+---
+
+## CU-17 — Cobrar ticket en caja
+
+- **ID:** CU-17
+- **Nombre:** Cobrar ticket en caja
+- **Actor/es:** Administrador
+- **Prioridad:** Must
+- **Precondición:** El ticket ha sido enviado a caja y está pendiente de cobro
+- **Postcondición:** El ticket queda cerrado, la mesa se libera y el cobro queda registrado en auditoría
+
+**Flujo principal**
+1. El Administrador accede a la vista de caja.
+2. El sistema muestra los tickets pendientes de cobro.
+3. El Administrador selecciona el ticket y confirma el cobro.
+4. El sistema cierra el ticket, libera la mesa y registra el cobro en el log de auditoría con usuario y timestamp.
+
+---
+
+## CU-18 — Ver listado de reservas del día
+
+- **ID:** CU-18
+- **Nombre:** Ver listado de reservas del día
+- **Actor/es:** Administrador
+- **Prioridad:** Must
+- **Precondición:** El Administrador ha iniciado sesión
+- **Postcondición:** El Administrador visualiza todas las reservas del día ordenadas por hora
+
+**Flujo principal**
+1. El Administrador accede al módulo de reservas.
+2. El sistema muestra el listado de reservas del día con: nombre, mesa, zona, hora y número de comensales.
+3. Cada reserva muestra su estado: pendiente, confirmada o cancelada.
+
+---
+
+## CU-19 — Gestionar reservas
+
+- **ID:** CU-19
+- **Nombre:** Gestionar reservas (Crear, Editar, Cancelar)
+- **Actor/es:** Administrador
+- **Prioridad:** Must
+- **Precondición:** El Administrador ha iniciado sesión
+- **Postcondición:** La reserva queda creada, modificada o cancelada en el sistema
+
+**Flujo principal**
+1. El Administrador accede al módulo de reservas.
+2. El Administrador selecciona crear, editar o cancelar una reserva.
+3. Para crear o editar: introduce nombre, mesa, zona, fecha, hora y número de comensales.
+4. El sistema valida que no exista conflicto de horario para esa mesa.
+5. El sistema guarda los cambios y actualiza el listado.
+
+**Flujos alternativos**
+- *CU-N04:* Si ya existe una reserva activa para esa mesa en el mismo tramo horario, el sistema rechaza la operación.
+
+---
+
+## CU-20 — Asignar mesa a reserva
+
+- **ID:** CU-20
+- **Nombre:** Asignar mesa a reserva
+- **Actor/es:** Administrador
+- **Prioridad:** Must
+- **Precondición:** Existe una reserva sin mesa asignada o se desea reasignar
+- **Postcondición:** La reserva queda vinculada a una mesa concreta y la mesa aparece como reservada en el plano
+
+**Flujo principal**
+1. El Administrador selecciona una reserva del listado.
+2. El sistema muestra el plano de sala con las mesas disponibles para el tramo horario.
+3. El Administrador selecciona una mesa disponible.
+4. El sistema vincula la mesa a la reserva y actualiza su estado a reservada en el plano.
+
+---
+
+## CU-21 — Gestionar usuarios y roles
+
+- **ID:** CU-21
+- **Nombre:** Gestionar usuarios y roles
+- **Actor/es:** Administrador
+- **Prioridad:** Must
+- **Precondición:** El Administrador ha iniciado sesión
+- **Postcondición:** El usuario queda creado, modificado o eliminado con su rol asignado
+
+**Flujo principal**
+1. El Administrador accede al panel de gestión de usuarios.
+2. El sistema muestra el listado de usuarios activos con su rol.
+3. El Administrador puede crear un nuevo usuario introduciendo nombre, email, contraseña y rol.
+4. El Administrador puede editar el rol o datos de un usuario existente.
+5. El Administrador puede desactivar o eliminar un usuario.
+6. El sistema guarda los cambios y los aplica de forma inmediata.
+
+**Flujos alternativos**
+- *CU-N02:* Si un usuario sin rol de Administrador intenta acceder, el sistema bloquea la operación.
+
+---
+
+## CU-25 — Gestionar carta
+
+- **ID:** CU-25
+- **Nombre:** Gestionar carta (Añadir, Editar, Eliminar platos)
+- **Actor/es:** Administrador
+- **Prioridad:** Must
+- **Precondición:** El Administrador ha iniciado sesión
+- **Postcondición:** El plato queda añadido, actualizado o eliminado de la carta
+
+**Flujo principal**
+1. El Administrador accede al módulo de gestión de carta.
+2. El sistema muestra el listado de platos agrupados por categoría.
+3. El Administrador puede añadir un plato nuevo con nombre, precio, categoría e indicador de menú del día.
+4. El Administrador puede editar cualquier campo de un plato existente.
+5. El Administrador puede eliminar un plato de la carta.
+6. Los cambios se aplican de forma inmediata en la vista de toma de comandas.
+
+---
+
+## CU-27 — Enviar notificaciones automáticas
+
+- **ID:** CU-27
+- **Nombre:** Enviar notificaciones automáticas
+- **Actor/es:** Sistema de Notificaciones
+- **Prioridad:** Must
+- **Precondición:** Se ha producido un evento relevante en el sistema
+- **Postcondición:** La notificación llega al actor correspondiente en menos de 2 segundos
+
+**Flujo principal**
+1. Se produce un evento: plato listo, reserva próxima o actualización de KDS.
+2. El Sistema de Notificaciones detecta el evento.
+3. El sistema envía la notificación al actor correspondiente vía WebSocket:
+   - Plato listo → camarero de la mesa.
+   - Reserva próxima (≤5 min) → camarero de la mesa afectada.
+   - Actualización de KDS → cocinero.
+4. El dispositivo del receptor muestra el aviso de forma visible.
+
+---
+
+## CU-N01 — Denegar acceso por credenciales incorrectas
+
+- **ID:** CU-N01
+- **Nombre:** Acceso denegado por credenciales incorrectas
+- **Actor/es:** Camarero, Administrador, Cocinero
+- **Prioridad:** Must
+- **Precondición:** El usuario introduce credenciales incorrectas en el formulario de login
+- **Postcondición:** El sistema deniega el acceso y muestra un mensaje de error
+
+**Flujo principal**
+1. El usuario introduce email o contraseña incorrectos.
+2. El sistema valida las credenciales y detecta el error.
+3. El sistema muestra un mensaje de error genérico sin revelar qué campo es incorrecto.
+4. El intento queda registrado internamente para el control de bloqueo.
+
+---
+
+## CU-N02 — Bloquear operación por rol insuficiente
+
+- **ID:** CU-N02
+- **Nombre:** Operación bloqueada por rol insuficiente
+- **Actor/es:** Camarero, Cocinero
+- **Prioridad:** Must
+- **Precondición:** Un usuario intenta ejecutar una acción para la que no tiene permisos
+- **Postcondición:** El sistema bloquea la operación y muestra un mensaje informativo
+
+**Flujo principal**
+1. El usuario intenta acceder a una funcionalidad restringida.
+2. El sistema comprueba el rol del token JWT.
+3. El sistema detecta que el rol no tiene permisos para esa operación.
+4. El sistema bloquea la acción y muestra un aviso de acceso denegado.
+
+---
+
+## CU-N03 — Rechazar comanda por alérgenos incompletos
+
+- **ID:** CU-N03
+- **Nombre:** Comanda rechazada por alérgenos incompletos
+- **Actor/es:** Camarero, Administrador
+- **Prioridad:** Must
+- **Precondición:** El usuario intenta enviar una comanda con alérgenos sin completar
+- **Postcondición:** El sistema bloquea el envío y señala las líneas con alérgenos pendientes
+
+**Flujo principal**
+1. El usuario pulsa "Enviar comanda".
+2. El sistema valida que todas las líneas tienen los alérgenos registrados.
+3. El sistema detecta una o más líneas con alérgenos incompletos.
+4. El sistema bloquea el envío, resalta visualmente las líneas afectadas y muestra un aviso.
+
+---
+
+## CU-N05 — Bloquear edición  de línea en preparación
+
+- **ID:** CU-N05
+- **Nombre:** Edición bloqueada de línea en preparación
+- **Actor/es:** Camarero, Administrador
+- **Prioridad:** Must
+- **Precondición:** Una línea de comanda está en estado en preparación o lista
+- **Postcondición:** El sistema bloquea la edición y muestra un aviso al usuario
+
+**Flujo principal**
+1. El usuario intenta modificar o eliminar una línea de comanda.
+2. El sistema comprueba el estado de la línea.
+3. El sistema detecta que la línea está en preparación o lista.
+4. El sistema bloquea la edición e informa de que el cocinero ya ha iniciado la preparación.
+
+---
+
+## CU-N06 — Rechazar ticket por mesa ya cobrada
+
+- **ID:** CU-N06
+- **Nombre:** Ticket rechazado por mesa ya cobrada
+- **Actor/es:** Camarero
+- **Prioridad:** Must
+- **Precondición:** El usuario intenta enviar o modificar el ticket de una mesa ya cobrada
+- **Postcondición:** El sistema rechaza la operación y muestra un aviso
+
+**Flujo principal**
+1. El usuario intenta enviar a caja o editar el ticket de una mesa.
+2. El sistema comprueba el estado del ticket.
+3. El sistema detecta que la mesa ya ha sido cobrada y cerrada.
+4. El sistema bloquea la operación e informa de que la mesa ya está cerrada.
+
+
+## Boceto de Prototipos Casos de Uso
+
+### Boceto 1 — Pantalla KDS y Panel Admin
+![Boceto 1](/Estudiantes/daniel-puente/Capitulo%202/imagenes/Prototipos1.jpeg)
+
+
+### Boceto 2  Reservas
 ![Prototipo 2](/Estudiantes/daniel-puente/Capitulo%202/imagenes/Prototipos2.jpeg)
 
+### Boceto 3  
 ![Prototipo 3](/Estudiantes/daniel-puente/Capitulo%202/imagenes/Prototipos3.jpeg)
 
+
+### Boceto 4
 ![Prototipo 4](/Estudiantes/daniel-puente/Capitulo%202/imagenes/Prototipos4.jpeg)
+
 
 ## Estructurar Casos de Uso
 
@@ -323,16 +819,15 @@ El objetivo de este paso es estructurar el modelo de casos de uso del sistema de
 | **CU-12 Marcar plato como listo** | CU-11 Marcar comanda en preparación | Un plato solo puede marcarse como listo si está en preparación |
 | **CU-09 Solicitar segundos platos** | CU-12 Marcar plato como listo | Solo se pueden solicitar segundos si los primeros están marcados como listos |
 
-
-#### Relación `<<extend>>`
+### Relación `<<extend>>`
 
 | Caso de uso principal | Caso de uso extendido | Explicación |
 |---|---|---|
-| **CU-01 Iniciar sesión** | CU-N01 Acceso denegado por credenciales incorrectas | El acceso se deniega si las credenciales introducidas son incorrectas |
+| **CU-01 Iniciar sesión** | CU-N01 Denegar acceso por credenciales incorrectas | El acceso se deniega si las credenciales introducidas son incorrectas |
 | **CU-01 Iniciar sesión** | CU-N10 Desbloquear cuenta por intentos fallidos | Tras 5 intentos fallidos el sistema bloquea la cuenta |
-| **CU-06 Tomar comanda** | CU-N03 Comanda rechazada por alérgenos incompletos | El envío se bloquea si alguna línea tiene alérgenos sin completar |
+| **CU-06 Tomar comanda** | CU-N03 Rechazar comanda por alérgenos incompletos | El envío se bloquea si alguna línea tiene alérgenos sin completar |
 | **CU-06 Tomar comanda** | CU-N07 Restringir pedido por falta de stock | El sistema impide añadir platos marcados como agotados |
-| **CU-08 Editar comanda** | CU-N05 Edición bloqueada de línea en preparación | La edición se bloquea si la línea ya está en preparación o lista |
-| **CU-14 Enviar ticket a caja** | CU-N06 Ticket rechazado por mesa ya cobrada | El envío se rechaza si la mesa ya ha sido cobrada y cerrada |
-| **CU-19 Gestionar reservas** | CU-N04 Reserva rechazada por conflicto de horario | La reserva se rechaza si existe otra activa en el mismo tramo horario |
-| **CU-21 Gestionar usuarios y roles** | CU-N02 Operación bloqueada por rol insuficiente | La operación se bloquea si el usuario no tiene rol de Administrador |
+| **CU-08 Editar comanda** | CU-N05 Bloquear edición de línea en preparación | La edición se bloquea si la línea ya está en preparación o lista |
+| **CU-14 Enviar ticket a caja** | CU-N06 Rechazar ticket por mesa ya cobrada | El envío se rechaza si la mesa ya ha sido cobrada y cerrada |
+| **CU-19 Gestionar reservas** | CU-N04 Rechazar reserva por conflicto de horario | La reserva se rechaza si existe otra activa en el mismo tramo horario |
+| **CU-21 Gestionar usuarios y roles** | CU-N02 Bloquear operación por rol insuficiente | La operación se bloquea si el usuario no tiene rol de Administrador |

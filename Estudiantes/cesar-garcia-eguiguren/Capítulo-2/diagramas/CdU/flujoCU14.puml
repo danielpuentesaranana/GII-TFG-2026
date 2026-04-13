@@ -7,42 +7,45 @@ skinparam ActivityBorderColor #1E2840
 skinparam ActivityBackgroundColor #141824
 skinparam ActivityDiamondBackgroundColor #0D1018
 skinparam ActivityDiamondBorderColor #38BDF8
-
+skinparam NoteBackgroundColor #141824
+skinparam NoteBorderColor #38BDF8
 title CU-14 · Consultar Riesgo de Proyecto
 
 start
+:El actor accede a la página de métricas;
+:El actor selecciona un proyecto;
+:El actor selecciona la métrica
+Índice de Riesgo;
+:El sistema verifica que el proyecto
+pertenece al ámbito del actor;
 
-:CU-01 (JWT válido);
-:Actor en **/métricas** selecciona proyecto;
+if (¿Proyecto en el ámbito?) then (NO)
+  :El sistema deniega el acceso;
+  stop
+else (SÍ)
+  :El sistema analiza las tareas abiertas
+  del proyecto con fecha límite establecida;
 
-:verify_project_scope(cu, project_id);
+  :El sistema identifica tareas en riesgo:
+  · Tareas con fecha límite vencida
+  · Tareas con gran parte del plazo consumido;
 
-if (¿Fuera de scope?) then (SÍ)
-  :HTTP 403;
+  :El sistema clasifica el nivel de riesgo:
+  · Bajo: pocas tareas en riesgo
+  · Medio: nivel preocupante
+  · Alto: situación crítica;
+
+  :El sistema muestra:
+  · Índice de riesgo (%)
+  · Número de tareas en riesgo
+  · Total de tareas abiertas analizadas
+  · Nivel de riesgo con semáforo de color;
   stop
 endif
 
-:GET /metrics/risk-index?project_id=X
- [&root_only];
-
-:RiskIndexService.calculate()
- Tareas abiertas con date_deadline:
- → En riesgo si:
-   · date_deadline < hoy (vencida), O
-   · elapsed/total ≥ 80% del plazo
-     desde date_assign;
-
-:risk_index = (en_riesgo / abiertas) × 100;
-
-:PieChart: En riesgo vs En plazo;
-
-:KPIs:
-· Índice de riesgo %
-· Tareas en riesgo
-· Total tareas abiertas;
-
-:Semáforo: < 20% bajo · 20-50% medio · > 50% alto;
-
-stop
+note right
+  FA-01: Proyecto fuera del ámbito → acceso denegado
+  FA-02: Sin tareas abiertas con fecha límite → riesgo = 0
+end note
 
 @enduml

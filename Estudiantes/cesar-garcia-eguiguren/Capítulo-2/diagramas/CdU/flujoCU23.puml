@@ -7,90 +7,66 @@ skinparam ActivityBorderColor #1E2840
 skinparam ActivityBackgroundColor #141824
 skinparam ActivityDiamondBackgroundColor #0D1018
 skinparam ActivityDiamondBorderColor #38BDF8
-skinparam NoteFontColor #07090F
+skinparam NoteBackgroundColor #141824
+skinparam NoteBorderColor #38BDF8
 title CU-23 · Consultar Rentabilidad Financiera (Director exclusivo)
 
 start
+:El actor intenta acceder a la
+página de rentabilidad;
 
-:<<include>> CU-01 (JWT válido);
+if (¿El actor es Director?) then (NO)
+  :El sistema muestra una pantalla
+  de acceso restringido;
+  stop
+else (SÍ)
+  :El actor configura los filtros:
+  · Rango de fechas
+  · Modo de análisis (Global / Por proyecto
+    / Por responsable);
 
-if (¿role == "director"?) then (NO)
-  :ProtectedRoute (frontend) muestra
-   pantalla "Acceso restringido";
-  :require_director (backend) devuelve HTTP 403;
+  :El sistema muestra el resumen financiero:
+  · Ingresos totales
+  · Gastos totales
+  · Resultado neto
+  · Rentabilidad porcentual
+  · Gráfico comparativo por proyecto
+  · Distribución de estados (ganancia/neutro/pérdida);
+
+  :El actor selecciona una pestaña de desglose;
+
+  if (Pestaña seleccionada) then (Por proyecto)
+    :El sistema muestra la tabla de rentabilidad
+    desglosada por proyecto;
+
+    if (¿El actor solicita el detalle de un proyecto?) then (SÍ)
+      :<<extend>> CU-24
+      El sistema muestra las líneas analíticas
+      individuales del proyecto;
+    endif
+
+  else (Por cliente)
+    :El sistema muestra la tabla de rentabilidad
+    agregada por cliente;
+
+    if (¿El actor solicita el detalle de un cliente?) then (SÍ)
+      :<<extend>> CU-25
+      El sistema muestra las líneas analíticas
+      del cliente agrupando todos sus proyectos;
+    endif
+  endif
+
+  if (Modo == Por responsable AND responsable seleccionado) then (SÍ)
+    :El sistema muestra el panel de rentabilidad
+    del responsable seleccionado con sus proyectos;
+  endif
+
   stop
 endif
 
-:Actor navega a **/rentabilidad**;
-:Actor selecciona rango de fechas;
-:Actor selecciona modo de filtro;
-
-if (Modo filtro) then (**Global**)
-  :Sin filtro adicional;
-else if (Modo filtro) then (**Por proyecto**)
-  :Actor selecciona proyecto (select);
-  :?project_id=X;
-else (**Por responsable**)
-  :Actor selecciona manager (select)
-   o hace click en botón de la lista de managers;
-  :?manager_id=X;
-  :Aparece botón "Ver detalle →";
-endif
-
-fork
-  :GET /metrics/profitability/summary
-   ?date_from&date_to;
-  :Totales globales:
-   income, expense, net, total_hours
-   Conteo proyectos: ganancia/neutro/perdida;
-fork again
-  :GET /metrics/profitability/per-project
-   [?project_id & manager_id & dates];
-fork again
-  :GET /metrics/profitability/per-client
-   [?project_id & manager_id & dates];
-end fork
-
 note right
-  Fuente: account_analytic_line.amount
-  positivo = ingreso
-  negativo = gasto
+  FA-01: Sin partes analíticos → indicadores a 0
+  FA-02: Actor sin rol Director → pantalla restringida
 end note
-
-:4 KPIs: Ingresos | Gastos (abs) | Neto | Rentabilidad %;
-
-:BarChart agrupado ingresos vs gastos por proyecto (top 12);
-:PieChart: Ganancia / Neutro / Pérdida (count por estado);
-
-:Pestaña **Por proyecto** → tabla con
- income, expense, net, horas, rentabilidad%, badge;
-
-if (¿Click en "Ver Detalles" fila proyecto?) then (SÍ)
-  :<<extend>> CU-24
-   → GET /metrics/profitability/per-project/{id}/lines
-   → Panel de líneas analíticas ingresos/gastos;
-endif
-
-:Pestaña **Por cliente** → tabla agrupada
- por partner_id;
-
-if (¿Click en "Ver Detalles" fila cliente?) then (SÍ)
-  :<<extend>> CU-25
-   → GET /metrics/profitability/per-client/{id}/lines
-   → Panel de líneas analíticas por cliente;
-endif
-
-if (Modo == Por responsable AND manager seleccionado) then (SÍ)
-  if (¿Click "Ver detalle →"?) then (SÍ)
-    :ManagerPanel:
-     GET /metrics/profitability/manager/{id}
-     → tabla de proyectos + KPIs del responsable
-     → BarChart ingresos vs gastos top-10;
-    :Botón "← Volver" para regresar a la vista principal;
-  endif
-endif
-
-stop
-
 
 @enduml

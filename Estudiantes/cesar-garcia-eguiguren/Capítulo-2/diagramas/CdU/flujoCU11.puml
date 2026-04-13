@@ -7,38 +7,40 @@ skinparam ActivityBorderColor #1E2840
 skinparam ActivityBackgroundColor #141824
 skinparam ActivityDiamondBackgroundColor #0D1018
 skinparam ActivityDiamondBorderColor #38BDF8
-
+skinparam NoteBackgroundColor #141824
+skinparam NoteBorderColor #38BDF8
 title CU-11 · Consultar Cumplimiento de Plazos
 
 start
+:El actor accede a la página de métricas;
+:El actor selecciona la métrica
+Cumplimiento de Plazos;
+:El actor puede aplicar filtros opcionales:
+· Empleado concreto
+· Proyecto concreto;
 
-:CU-01 (JWT válido);
-:Métrica disponible en **/métricas**
- (también cargada en CU-02 para panel de salud);
+:El sistema calcula el porcentaje de tareas
+cerradas que se completaron antes o en
+la fecha límite establecida;
 
-:GET /metrics/compliance
- [?employee_id & project_id & root_only];
-
-if (¿Filtros de scope inválidos?) then (SÍ)
-  :HTTP 403;
+if (¿Existen tareas con fecha límite y cierre?) then (NO)
+  :El sistema muestra que no hay datos
+  disponibles para los filtros aplicados;
+  stop
+else (SÍ)
+  :El sistema muestra:
+  · Tasa de cumplimiento (%)
+  · Número de tareas a tiempo
+  · Número de tareas con retraso
+  · Indicador visual de semáforo;
   stop
 endif
 
-:ComplianceService.calculate()
- count_tasks_on_time():
- → on_time: date_end ≤ date_deadline
- → total: tareas cerradas con ambas fechas;
-
-:compliance_rate = (on_time / total) × 100;
-
-:Gauge / PieChart central con %:
-· Verde ≥ 80% · Naranja ≥ 60% · Rojo < 60%;
-
-:KPIs:
-· Tareas a tiempo
-· Tareas con retraso
-· Total analizadas;
-
-stop
+note right
+  Semáforo de referencia:
+  ≥ 80% → verde (cumplimiento bueno)
+  ≥ 60% → naranja (cumplimiento aceptable)
+  < 60% → rojo (cumplimiento deficiente)
+end note
 
 @enduml

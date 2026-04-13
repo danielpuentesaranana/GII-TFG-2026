@@ -7,32 +7,38 @@ skinparam ActivityBorderColor #1E2840
 skinparam ActivityBackgroundColor #141824
 skinparam ActivityDiamondBackgroundColor #0D1018
 skinparam ActivityDiamondBorderColor #38BDF8
-
-title CU-20 · Consultar Tiempo por Prioridad
+skinparam NoteBackgroundColor #141824
+skinparam NoteBorderColor #38BDF8
+title CU-20 · Consultar Tiempo Invertido por Prioridad
 
 start
+:El actor accede a la página de métricas;
+:El actor selecciona la métrica
+Tiempo por Prioridad;
+:El actor puede aplicar filtros opcionales:
+· Empleado concreto
+· Proyecto concreto;
 
-:CU-01 (JWT válido);
-:Actor en **/métricas**;
+:El sistema agrupa las tareas cerradas
+por nivel de prioridad y calcula
+las horas medias invertidas en cada grupo;
 
-:GET /metrics/priority-time
- [?employee_id & project_id & root_only];
+if (¿Existen tareas cerradas con horas registradas?) then (NO)
+  :El sistema muestra que no hay datos
+  disponibles para los filtros aplicados;
+  stop
+else (SÍ)
+  :El sistema muestra las horas medias
+  invertidas por nivel de prioridad:
+  · Prioridad Normal
+  · Prioridad Urgente;
+  stop
+endif
 
-:PriorityTimeService.calculate()
- Tareas cerradas agrupadas por prioridad:
- · muy baja, baja, normal, alta, critica
- Suma worked_hours, count de tareas;
-
-:Por cada grupo:
- valor = total_hours / task_count (media)
- unit = "horas"
- description = "Promedio de N tareas";
-
-:Resultado: {Normal: PriorityTimeItem, Urgente: PriorityTimeItem};
-
-:Visualización en tarjeta de métrica:
- Horas medias por nivel de prioridad;
-
-stop
+note right
+  Permite identificar si las tareas urgentes
+  consumen desproporcionadamente más tiempo
+  que las de prioridad normal.
+end note
 
 @enduml

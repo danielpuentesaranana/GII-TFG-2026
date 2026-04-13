@@ -7,64 +7,50 @@ skinparam ActivityBorderColor #1E2840
 skinparam ActivityBackgroundColor #141824
 skinparam ActivityDiamondBackgroundColor #0D1018
 skinparam ActivityDiamondBorderColor #38BDF8
-skinparam NoteFontColor #07090F
-
+skinparam NoteBackgroundColor #141824
+skinparam NoteBorderColor #38BDF8
 title CU-21 · Visualizar Gráficos Analíticos
 
 start
+:El actor accede a la página de gráficos;
+:El sistema carga los selectores de filtro
+con los empleados, departamentos
+y proyectos disponibles según el rol;
 
-:CU-01 (JWT válido);
-:Actor navega a **/gráficos**;
+:El actor configura los parámetros
+de visualización:
+· Rango de fechas
+· Agrupación temporal (semana / mes)
+· Entidad de análisis (empresa / empleado
+  / departamento / proyecto);
 
-:Carga de soporte al montar:
- GET /employees/?page_size=200
- GET /departments/
- GET /projects/;
+:El sistema genera y muestra los gráficos
+disponibles para el actor:
+· Evolución temporal de tareas
+  (completadas, abiertas y vencidas)
+· Distribución de tareas por estado actual;
 
-:Actor configura filtros:
- · Rango de fechas (shortcuts: 30d/3m/6m/1a)
- · Agrupación: semana | mes
- · Tipo de entidad: empresa / empleado / dpto / proyecto
- · Entidad específica (select dependiente del tipo);
-
-fork
-  :GET /charts/task-evolution
-   ?date_from&date_to&group_by
-   [&employee_id | department_id | project_id];
-fork again
-  :GET /charts/task-distribution
-   ?date_from&date_to;
-fork again
-  :GET /metrics/client-distribution
-   ?date_from&date_to
-   (Solo visible para Director en UI);
-end fork
-
-if (¿Responsable?) then (SÍ)
-  :task-distribution filtrado por project_ids del JWT;
-  :client-distribution NO se llama (hidden en UI);
-  :task-evolution filtrado por project_ids del JWT;
+if (¿El actor es Director?) then (SÍ)
+  :El sistema muestra adicionalmente:
+  · Distribución de horas por cliente;
 endif
 
-:Gráfico 1 (LineChart): Evolución de tareas
- completadas / abiertas / vencidas por período;
-
-:Gráfico 2 (PieChart): Distribución por estado
- (etapas actuales con % inline);
-
-if (¿Director?) then (SÍ)
-  :Gráfico 3 (BarChart horizontal):
-   Horas por cliente — top 10;
+if (¿El actor cambia los filtros?) then (SÍ)
+  :El sistema recalcula y actualiza
+  todos los gráficos;
 endif
 
-:Actor cambia agrupación semana/mes;
-note right: Nueva petición a task-evolution
-
-if (¿Sin datos en período?) then (SÍ)
-  :Cada gráfico muestra empty state o "Sin datos";
+if (¿Existen datos en el período?) then (NO)
+  :El sistema muestra un mensaje
+  de sin datos en cada gráfico afectado;
 endif
 
 stop
 
+note right
+  FA-01: Sin datos en el período → mensaje por gráfico
+  FA-02: El Responsable no visualiza la distribución
+         por cliente ni datos fuera de su ámbito
+end note
 
 @enduml

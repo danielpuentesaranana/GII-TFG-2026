@@ -7,35 +7,40 @@ skinparam ActivityBorderColor #1E2840
 skinparam ActivityBackgroundColor #141824
 skinparam ActivityDiamondBackgroundColor #0D1018
 skinparam ActivityDiamondBorderColor #38BDF8
-
+skinparam NoteBackgroundColor #141824
+skinparam NoteBorderColor #38BDF8
 title CU-15 · Consultar Tasa de Retrabajo
 
 start
+:El actor accede a la página de métricas;
+:El actor selecciona la métrica
+Tasa de Retrabajo;
+:El actor puede aplicar filtros opcionales:
+· Proyecto concreto
+· Empleado concreto;
 
-:CU-01 (JWT válido);
-:Métrica disponible en **/métricas**
- (también cargada en CU-02 para panel de salud);
+:El sistema analiza el historial de cambios
+de estado de las tareas y detecta las que
+fueron cerradas y posteriormente reabiertas;
 
-:GET /metrics/rework-rate
- [?project_id & employee_id & root_only];
+if (¿Existen tareas cerradas en el ámbito?) then (NO)
+  :El sistema muestra que no hay datos
+  disponibles para los filtros aplicados;
+  stop
+else (SÍ)
+  :El sistema muestra:
+  · Tasa de retrabajo (%)
+  · Número de tareas reabiertos
+  · Total de tareas cerradas analizadas
+  · Indicador visual de semáforo;
+  stop
+endif
 
-:ReworkRateService.calculate()
- 1. Obtiene tareas cerradas en scope
- 2. get_tasks_reopened() analiza
-    mail_tracking_value:
-    tarea reabierta = cerrada → abierta en historial;
-
-:rework_rate = (reabiertos / cerradas) × 100;
-
-:PieChart: Reabiertos vs OK;
-
-:KPIs:
-· Tasa de retrabajo %
-· Tareas reabiertos
-· Total cerradas;
-
-:Semáforo: < 8% verde · 8-15% naranja · > 15% rojo;
-
-stop
+note right
+  Semáforo de referencia:
+  < 8%  → verde (nivel aceptable)
+  8-15% → naranja (nivel a vigilar)
+  > 15% → rojo (nivel problemático)
+end note
 
 @enduml

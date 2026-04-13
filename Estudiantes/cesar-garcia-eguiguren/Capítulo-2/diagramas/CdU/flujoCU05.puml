@@ -7,54 +7,43 @@ skinparam ActivityBorderColor #1E2840
 skinparam ActivityBackgroundColor #141824
 skinparam ActivityDiamondBackgroundColor #0D1018
 skinparam ActivityDiamondBorderColor #38BDF8
-
+skinparam NoteBackgroundColor #141824
+skinparam NoteBorderColor #38BDF8
 title CU-05 · Consultar Resumen de Departamento
 
 start
+:El actor selecciona un departamento;
+:El sistema verifica que el departamento
+pertenece al ámbito del actor;
 
-:CU-01 (JWT válido);
-:Actor accede a **/departamentos/{id}**
-(desde CU-06 o enlace en CU-03);
+if (¿Departamento en el ámbito?) then (NO)
+  :El sistema deniega el acceso;
+  stop
+else (SÍ)
+  :El sistema muestra el panel del departamento:
+  · Nombre y responsable
+  · Indicadores de distribución de carga
+  · Alerta si hay empleados sobrecargados;
 
-:verify_department_scope(cu, department_id);
+  :El actor selecciona una pestaña de visualización;
 
-if (¿Fuera de scope?) then (SÍ)
-  :HTTP 403;
+  if (Pestaña seleccionada) then (Carga de trabajo)
+    :El sistema muestra la tabla de empleados
+    con su porcentaje de carga y estado;
+  else (Empleados)
+    :El sistema muestra el listado de empleados
+    del departamento con sus datos básicos;
+  endif
+
+  if (¿El actor selecciona un empleado?) then (SÍ)
+    :Navega a CU-03 Resumen de Empleado;
+  endif
   stop
 endif
 
-fork
-  :GET /departments/{id};
-fork again
-  :GET /departments/{id}/workload-summary
-   → WorkloadService por cada empleado;
-end fork
-
-:Cabecera: Nombre + Manager;
-
-:4 KPIs:
-· Total empleados
-· Sobrecargados (workload_pct > 120%)
-· Subcargados (workload_pct < 70%)
-· Sin tareas;
-
-if (¿Hay sobrecargados?) then (SÍ)
-  :Banner rojo con nombres de sobrecargados;
-endif
-
-:Actor selecciona pestaña;
-
-if (Pestaña) then (**Carga de trabajo**)
-  :Tabla ordenable client-side:
-   Empleado | Pend. | H. pend.
-   Completadas | Barra carga% | Badge estado;
-  :Click en empleado → CU-05;
-else (**Empleados**)
-  :GET /departments/{id}/employees
-   → Tabla: Nombre | Cargo | Email | Coste/h | Badge activo;
-  :Click en empleado → CU-05;
-endif
-
-stop
+note right
+  FA-01: Departamento fuera del ámbito → acceso denegado
+  FA-02: Departamento sin empleados → pestañas vacías
+end note
 
 @enduml

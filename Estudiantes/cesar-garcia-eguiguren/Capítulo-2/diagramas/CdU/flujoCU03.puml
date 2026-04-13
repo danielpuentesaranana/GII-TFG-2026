@@ -7,80 +7,46 @@ skinparam ActivityBorderColor #1E2840
 skinparam ActivityBackgroundColor #141824
 skinparam ActivityDiamondBackgroundColor #0D1018
 skinparam ActivityDiamondBorderColor #38BDF8
-skinparam NoteFontColor #07090F
+skinparam NoteBackgroundColor #141824
+skinparam NoteBorderColor #38BDF8
+
 title CU-03 · Consultar Resumen de Empleado
 
 start
+:El actor selecciona un empleado;
+:El sistema verifica que el empleado
+pertenece al ámbito del actor;
 
-:CU-01 (JWT válido);
-:Actor navega a **/empleados/{id}**
-(desde CU-04, CU-03 o CU-07);
-
-:verify_employee_scope(cu, employee_id);
-
-if (¿Empleado fuera del scope?) then (SÍ)
-  :HTTP 403 — Acceso denegado;
+if (¿Empleado en el ámbito?) then (NO)
+  :El sistema deniega el acceso;
   stop
-else (EN SCOPE)
+else (SÍ)
+  :El sistema muestra el perfil del empleado:
+  · Datos personales y profesionales
+  · Indicadores de carga de trabajo
+  · WIP (tareas en paralelo)
+  · Productividad reciente;
+
+  :El actor visualiza las tareas del empleado
+  organizadas por pestañas:
+  · Pendientes
+  · Completadas
+  · Asignadas
+  · Como responsable;
+
+  :El actor puede aplicar filtros
+  de rango de fechas sobre las tareas;
+
+  if (¿El actor selecciona una tarea?) then (SÍ)
+    :Navega a CU-09 Detalle de Tarea;
+  endif
+  stop
 endif
 
-fork
-  :GET /employees/{id};
-fork again
-  :GET /dashboards/summary/employee/{id}
-   → WorkloadService(detailed=True):
-     pending_tasks con fechas, is_overdue
-   → WIPService: wip_count, status
-   → ProductivityService(últimos 30d);
-end fork
-
-:Cabecera:
-· Avatar inicial (primera letra del nombre)
-· Nombre, cargo, departamento, email
-· Coste/h · Badge workload (sobrecargado/normal/subcargado);
-
-:4 KPIs:
-· Tareas pendientes + horas pendientes (WorkloadService)
-· Vencidas sin cerrar (filtradas client-side de wl.pending_tasks)
-· WIP actual (WIPService)
-· Productividad 30d (ProductivityService);
-
-:Tarjeta "Asignadas hoy"
- — filtra client-side: isToday(task.date_assign)
- → click navega a
-   /tareas/filtro?status=pending&date_assign={hoy}&employee_id={id};
-
-:Tarjeta "Vencidas sin cerrar"
- — filtra client-side: task.is_overdue == true
- → click navega a
-   /tareas/filtro?status=overdue&employee_id={id};
-
-:Actor selecciona pestaña de tareas;
-
-if (Pestaña) then (**Pendientes**)
-  :<<extend>> CU-10
-  GET /employees/{id}/pending-tasks
-  [?date_from&date_to];
-else if (Pestaña) then (**Completadas**)
-  :<<extend>> CU-10
-  GET /employees/{id}/completed-tasks
-  [?date_from&date_to];
-else if (Pestaña) then (**Asignadas**)
-  :<<extend>> CU-10
-  GET /employees/{id}/assigned-tasks
-  [?date_from&date_to]
-  + filtro local: Todas/Abiertas/Cerradas;
-else (**Responsable**)
-  :<<extend>> CU-10
-  GET /employees/{id}/responsible-tasks
-  [?date_from&date_to];
-endif
-
-if (¿Click en tarea?) then (SÍ)
-  :Navega a CU-11 /tareas/{id};
-endif
-
-stop
-
+note right
+  FA-01: Empleado fuera del ámbito → acceso denegado
+  FA-02: Empleado sin usuario vinculado
+         → métricas a 0, tareas vacías
+end note
 
 @enduml

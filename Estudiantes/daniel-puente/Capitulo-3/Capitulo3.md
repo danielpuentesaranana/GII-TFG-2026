@@ -53,3 +53,13 @@ UsuarioController: Gestiona el alta, edición y eliminación de usuarios del sis
 CartaController: Permite al Administrador gestionar los platos disponibles en la carta y configurar las tarifas del menú del día.
 
 El uso de controladores desacoplados mejora la mantenibilidad y estabilidad del sistema, y está alineado con las buenas prácticas de desarrollo backend en Node.js con Express.
+
+## VISTAS (Falta Diagrama)
+
+Las vistas representan la capa de presentación del sistema y se adaptan al rol autenticado en cada acceso. La aplicación se desarrolla como una PWA pensada para tablet, de modo que cada usuario visualiza únicamente las opciones correspondientes a sus permisos.
+
+En este sentido, existen vistas compartidas entre Camarero y Administrador, como el plano de mesas, la consulta y edición de comandas y el envío de tickets a caja. Esto se debe a que el Administrador también puede asumir funciones operativas de sala cuando sea necesario.
+
+Por otro lado, la vista del Cocinero corresponde al módulo KDS, donde se muestran en tiempo real las comandas pendientes y en preparación, junto con alérgenos y observaciones destacadas. Desde esta pantalla puede actualizar estados y provocar el envío de notificaciones automáticas al camarero.
+
+Finalmente, el Administrador dispone de vistas exclusivas para la gestión de reservas, usuarios y roles, carta, menú del día, caja y auditoría. Todas las vistas se comunican con los controladores mediante la API REST y WebSocket, garantizando que la información se mantenga sincronizada durante el servicio.

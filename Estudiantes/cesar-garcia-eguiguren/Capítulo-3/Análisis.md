@@ -93,7 +93,7 @@ Esta sección describe qué sucede en cada caso de uso desde el punto de vista d
 - Entrada: identificador del proyecto
 - Salida: ficha del proyecto + métricas de eficiencia, riesgo y rentabilidad por horas + listado de tareas y equipo asignado
 
-**CU-08 — Listar y filtrar tareas**
+**CU-08 — Listar tareas**
 - Actor: Director, Responsable
 - Entrada: filtros combinables (estado, etapa, proyecto, departamento, fechas, empleado, responsable, solo-raíz, paginación, ordenación)
 - Salida: lista paginada de tareas con nombre, etapa, horas estimadas, deadline y estado; las tareas filtradas por empleado incluyen horas trabajadas, pendientes y productividad según el estado seleccionado

@@ -237,3 +237,283 @@ Esta sección especifica el flujo detallado de los casos de uso más representat
 
 ![Diagrama de secuencia detallado de CU-28](./imagenes/CdU/CU-28.png)
 
+# 7. Diseño de Clases
+
+Con 13 modelos ORM, 11 repositorios base, 16 repositorios de métricas, 14 servicios
+de métricas, 11 servicios de dominio, 9 routers y 12 páginas del frontend, intentar
+representar todas las dependencias en un único diagrama produce un resultado
+ilegible. La estrategia seguida aquí es **presentar la arquitectura en ocho
+diagramas pequeños, cada uno respondiendo a una pregunta concreta**.
+
+En aquellos diagramas donde varias clases-fuente emiten flechas que se cruzan, se
+aplica un **código cromático consistente**: cada clase-fuente recibe un color
+único que se hereda por sus flechas de dependencia salientes. El lector puede
+seguir cualquier flecha hasta su origen con un único movimiento visual.
+
+---
+
+## 7.1 Mapa general de clases por capa
+
+El primer diagrama es un **mapa de ubicación**: muestra qué vive en cada capa
+sin trazar flechas entre clases. Las flechas discontinuas verticales solo indican
+la dirección del flujo de dependencias (siempre hacia abajo).
+
+![Diagrama de clases](./imagenes/diseño/clasesGeneral.png)
+
+---
+
+## 7.2a Repositorios base (fuera de `/metrics`) ↔ Modelos
+
+Este diagrama cubre los **11 repositorios base**, es decir, los que viven
+directamente en `app/repositories/` sin entrar en el subpaquete `metrics/`.
+Son los proveedores de datos transversales del sistema: CRUD sobre las
+entidades de negocio (tareas, empleados, proyectos, departamentos,
+timesheets), autenticación, control de alcance (RBAC), búsqueda global,
+agregación para dashboards, gráficos y trazabilidad de cambios de Odoo.
+
+Cada repositorio recibe un color único que se hereda por sus flechas
+salientes: basta seguir el color para reconstruir de qué modelos depende.
+
+![Diagrama de repositorios base y modelos](./imagenes/diseño/repositorios-modelos.png)
+
+**Observaciones de diseño**
+
+- `auth.py` es un repositorio minúsculo y tiene una única razón para cambiar: la
+  política de autenticación contra Odoo (tabla `res_users`). Su aislamiento respeta
+  el SRP.
+- `task.py` y `timesheet.py` no solo exponen CRUD; también publican las subqueries
+  reutilizables que comparten con la capa de métricas (§7.3). Esto justifica que
+  sean los únicos repositorios base con doble rol.
+- `scope.py` concentra toda la lógica de resolución RBAC (director / responsable /
+  empleado) y es la única fuente autorizada para traducir un `user_id` a su
+  ámbito (`employee_ids`, `department_ids`, `project_ids`).
+- `tracking.py` es el único repositorio que accede a las tablas `mail_message`,
+  `mail_tracking_value` e `ir_model_fields`. Encapsula por completo la dependencia
+  con el motor de auditoría de Odoo.
+
+---
+
+## 7.2b Repositorios de métricas (dentro de `/metrics`) ↔ Modelos
+
+Este segundo diagrama cubre los **16 repositorios especializados** de
+`app/repositories/metrics/`. Cada uno implementa el acceso a datos necesario
+para calcular una métrica concreta (productividad, cumplimiento, WIP, lead
+time, rentabilidad, etc.).
+
+La mayoría de estos repositorios tienen una **huella estrecha sobre el modelo
+ORM**: acceden solo a 1–3 tablas directamente. El resto de la información la
+obtienen **reutilizando las subqueries publicadas por `task.py` y `timesheet.py`**
+(§7.3), lo que evita duplicar la lógica de "etapas abiertas/cerradas" y
+"horas imputadas" en cada métrica.
+
+Para evitar saturar el diagrama con 16 colores distintos se aplica un **código
+cromático por familia de métrica**:
+
+| Color    | Familia                                                    |
+|----------|------------------------------------------------------------|
+| Violeta  | Métricas de tarea individual (productividad, compliance, etc.) |
+| Cian     | Métricas de proyecto (eficiencia, rentabilidad, riesgo)       |
+| Verde    | Métricas de tiempo y flujo (lead time, state time, priority)  |
+| Naranja  | Métricas de equipo (workload, WIP)                            |
+| Coral    | Métricas financieras y de cliente (profitability, rentability, distribución) |
+| Azul     | Métricas de asistencia (attendance)                           |
+
+![Diagrama de metricas y modelos](./imagenes/diseño/repoMetricas-modelos.png)
+
+**Observaciones de diseño**
+
+- Los repositorios de métricas tienen una huella intencionadamente estrecha
+  sobre el modelo: el 80 % accede a 1–3 tablas directamente.
+- `workload.py` y `rentability.py` son los más amplios porque su resultado es
+  inherentemente agregado (tareas + horas + proyecto + empleado).
+- `attendance.py` es la única métrica que accede a la tabla `hr_attendance`;
+  está aislado del resto del modelo para reflejar que su origen de datos es el
+  módulo de control de fichajes de Odoo, no el de gestión de proyectos.
+- Ningún repositorio de métricas importa otro repositorio de métricas: la
+  composición se deja a la capa de servicios (§7.5).
+
+---
+
+## 7.3 Arquitectura de métricas: reutilización de subqueries
+
+Este diagrama muestra que los repositorios de métricas no vuelven a escribir cada uno su propia consulta de "etapas abiertas" ni "horas imputadas"; consumen tres
+subqueries reutilizables publicadas por `task.py` (violeta), `timesheet.py` (verde) y `scope.py` (azul). El código cromático permite ver a simple vista qué repositorio de métricas depende de cuál proveedor: si un repo tiene una única flecha violeta es que solo consulta estados de tarea; si tiene dos colores es que combina ambas fuentes.
+
+![Diagrama de reutilización de subqueries](./imagenes/diseño/reutilizacionMetricas.png)
+---
+
+## 7.4 Servicios de métricas ↔ Repositorios de métricas (correspondencia 1:1)
+
+Una vez establecido el patrón anterior, la capa de servicios de métricas es
+trivialmente regular: **cada servicio consume exactamente un repositorio de
+métricas**. Aquí no se aplican colores: la correspondencia 1:1 hace que las
+flechas vayan en paralelo sin cruzarse, y añadir 14 colores distintos sería
+decorativo más que informativo.
+
+![Diagrama de servicios de métricas y repositorios de métricas](./imagenes/diseño/serviciosMetricas-repositorios.png)
+
+---
+
+## 7.5 DashboardService: orquestación por composición
+
+El `DashboardService` no duplica lógica de métricas; las **compone**. Este
+diagrama hace visible la relación "consumer-of-services" que permite que un
+endpoint de dashboard (CU-03, CU-05, CU-07, CU-28) devuelva en una sola llamada
+lo equivalente a invocar seis endpoints de métricas distintos. Las flechas
+desde `DashboardService` van en cian (es el protagonista) y las de
+`DepartmentService` en naranja para distinguir sus respectivas dependencias
+sobre `WorkloadService`.
+
+![Diagrama de DashboardService y su composición de servicios de métricas](./imagenes/diseño/dashboardService.png)
+
+---
+
+## 7.6 Servicios de dominio ↔ Repositorios base
+
+Diagrama "simétrico" al 7.4 pero para la capa de dominio. Aquí la
+correspondencia ya no es 1:1 (un `ProjectService` puede depender de tres
+repositorios distintos para componer la respuesta completa) y **las flechas sí
+se cruzan**, porque varios servicios comparten repositorios como `employee.py`
+o `task.py`. El código cromático asigna un color único a cada servicio de
+dominio: para trazar sus dependencias basta seguir las flechas de ese color.
+
+![Diagrama de servicios de dominio y repositorios base](./imagenes/diseño/servicios-Repositorios.png)
+
+---
+
+## 7.7 Capa de presentación: Frontend ↔ Routes ↔ Services
+
+El último diagrama cierra el ciclo: muestra qué páginas del frontend disparan
+qué endpoints, y a qué servicios delegan esos endpoints. En este caso se
+renuncia al código cromático porque hay dieciocho clases-fuente (9 páginas +
+9 routers) y el número de colores excedería la capacidad del lector para
+distinguirlos. En su lugar el diagrama se apoya en la **disposición espacial
+estricta por columnas**: frontend a la izquierda, routers en el centro,
+servicios a la derecha, con correspondencia mayoritariamente horizontal.
+
+![Diagrama de frontend, routes y servicios](./imagenes/diseño/frontend-Routes-Services.png)
+
+---
+
+## 8. Diseño de Paquetes
+
+### 8.1 Principios aplicados en la organización de paquetes
+
+**Jerarquización por capas (Principio de jerarquización)**
+
+Las dependencias entre paquetes son exclusivamente descendentes. Ningún import apunta hacia arriba. Las rutas no importan modelos ORM ni repositorios directamente.
+
+**SRP — Una responsabilidad por módulo**
+
+Cada fichero de `repositories/metrics/` tiene una única razón para cambiar: la estructura de la tabla Odoo relevante para esa métrica. Cada fichero de `services/metrics/` tiene también una única razón: la fórmula de cálculo de esa métrica. El añadir una nueva métrica implica crear exactamente dos ficheros nuevos y un endpoint, sin tocar ningún módulo existente.
+
+**OCP — Abierto para extensión**
+
+El registro `_ITEM_BUILDERS` de `TaskService` permite añadir un nuevo tipo de ítem (por ejemplo, `"subtask"`) sin modificar el método `_build_items`: basta con añadir una entrada al diccionario y un método `_to_subtask()`. El bucle de construcción no contiene ningún `if/elif`.
+
+**ISP — Interfaces pequeñas y específicas**
+
+Cada servicio de métricas importa únicamente las funciones del submódulo concreto que necesita (`from app.repositories.metrics.wip import count_open_assigned_tasks`), no el paquete completo. En el frontend, cada página importa solo su módulo de API (`employees.js`, `metrics.js`, etc.).
+
+**DIP — Inversión de dependencias**
+
+Los servicios (módulos de alto nivel) no dependen de los modelos ORM (módulos de bajo nivel). Acceden a los datos exclusivamente a través de las funciones de repositorio, que actúan como abstracción. Cero imports `from app.models` en `routes/` o `services/`.
+
+**DRY — No te repitas**
+
+Las subqueries `open_stage_ids_subq()`, `closed_stage_ids_subq()` y `worked_hours_subq()` están definidas una sola vez en `task.py` y `timesheet.py` respectivamente. Todos los repositorios de métricas las importan y reutilizan. Las constantes de dominio (umbrales, etiquetas, ventanas temporales) están centralizadas en `core/constants.py`.
+
+**Cohesión funcional**
+
+Cada repositorio agrupa únicamente consultas de un mismo dominio de datos. No existe ningún módulo con funciones heterogéneas: `task.py` solo consulta tareas, `employee.py` solo consulta empleados, `rentability.py` solo consulta datos financieros.
+
+**Bajo acoplamiento**
+
+Los dos únicos casos de dependencia cruzada entre repositorios del mismo nivel (`repositories/metrics/` → `repositories/task.py` y `repositories/timesheet.py`) son de **acoplamiento por datos**: se comparten subqueries puras sin estado ni efectos secundarios. Este es el nivel más bajo de la escala de acoplamiento.
+
+### 8.2 Métricas de calidad
+
+| Principio | Indicador | Valor | Estado |
+|---|---|---|---|
+| Jerarquización | Imports ascendentes (violaciones de capa) | 0 | ✅ |
+| SRP | Módulos de repositorio con más de un dominio | 0 | ✅ |
+| OCP | Bifurcaciones if/elif en `_build_items` | 0 | ✅ |
+| DIP | Imports directos de Models en Routes | 0 | ✅ |
+| ISP | Servicios que importan el módulo de repo completo | 0 | ✅ |
+| DRY | Subqueries duplicadas entre repositorios | 0 | ✅ |
+| Cohesión funcional | Repos con funciones de múltiples dominios | 0 | ✅ |
+| Bajo acoplamiento | Dependencias cruzadas entre repos (acoplamiento por datos) | 2 justificadas | ✅ |
+
+---
+
+## 9. Prototipos de Interfaz
+
+Los prototipos presentados en esta sección fueron elaborados en la **Disciplina de Requisitos (Capítulo 2)** como parte del modelado de casos de uso. Se incluyen aquí como referencia visual para el diseño de la interfaz, dado que la implementación real del frontend se ajusta fielmente a ellos.
+
+---
+
+### P-01 — Vista de inicio (Overview)
+
+Panel de bienvenida con alertas activas, indicadores globales (proyectos, empleados, tareas) y accesos rápidos. Sirve de punto de entrada tras la autenticación (CU-01).
+
+![Vista de inicio — Overview](../Capítulo-2/imagenes/prototipado/Vista-Overview.png)
+
+---
+
+### P-02 — Resumen de Empleado (CU-03)
+
+Panel individual con cabecera de perfil, cuatro KPI cards (carga, vencidas, WIP, productividad), tarjetas de tareas asignadas hoy y vencidas sin cerrar, y tabla de tareas paginada con pestañas.
+
+![Prototipo CU-03 — Resumen de Empleado](../Capítulo-2/imagenes/prototipado/CU-05.png)
+
+**Decisiones de diseño implementadas:**
+- Las pestañas de tareas cargan bajo demanda invocando `GET /tasks/filter`.
+- Las tarjetas de alerta son clicables y navegan a la vista de tareas con filtros preseleccionados.
+
+---
+
+### P-03 — Listado y filtrado de tareas (CU-08)
+
+Tabla paginada con barra de filtros combinables: estado, etapa exacta (mutuamente excluyente con estado), proyecto, rango de fechas de deadline y opción de solo tareas padre.
+
+![Prototipo CU-08 — Listado de Tareas](../Capítulo-2/imagenes/prototipado/CU-10.png)
+
+**Decisiones de diseño implementadas:**
+- El selector de etapa tiene prioridad sobre el de estado cuando ambos están activos.
+- Las cabeceras de columna son clicables para cambiar el criterio de ordenación server-side.
+
+---
+
+### P-04 — Panel de métricas (CU-10 a CU-20)
+
+Cuadrícula de tarjetas métricas a la izquierda con gauge de preview. Al seleccionar una tarjeta, el panel derecho muestra el detalle completo con gráficos y KPIs. Panel de parámetros expandible en la parte superior.
+
+![Prototipo Métricas — CU-10 a CU-20](../Capítulo-2/imagenes/prototipado/CU-P7.png)
+
+**Decisiones de diseño implementadas:**
+- Las métricas que requieren parámetros (empleado, proyecto) muestran un estado vacío hasta que se rellenan.
+- El panel de detalle es sticky para no perder de vista los KPIs al hacer scroll en la cuadrícula.
+
+---
+
+### P-05 — Panel Manager / Supervisión de carga del equipo (CU-28)
+
+Cinco tarjetas numéricas clicables (total, sobrecargado, normal, subcargado, sin tareas), panel de empleados más cargados con barra de progreso, gráfico de distribución por estado y tabla paginada que aparece al seleccionar un estado.
+
+![Prototipo CU-28 — Panel Manager](../Capítulo-2/imagenes/prototipado/CU-28.png)
+
+**Decisiones de diseño implementadas:**
+- Las tarjetas de estado y las barras del gráfico desencadenan el mismo efecto: filtran la tabla inferior y hacen scroll automático hasta ella.
+- El nombre del empleado en la tabla enlaza directamente a su resumen (CU-03).
+
+---
+
+### P-06 — Rentabilidad Financiera (CU-23)
+
+Panel exclusivo del Director con filtros de fecha y modo de análisis (global / por proyecto / por responsable), KPIs financieros, gráfico comparativo de ingresos vs. gastos y pestañas de desglose por proyecto y por cliente con opción de drill-down a líneas analíticas.
+
+![Prototipo CU-23 — Rentabilidad](../Capítulo-2/imagenes/prototipado/CU-24.png)
+
+**Decisiones de diseño implementadas:**
+- El acceso al módulo devuelve una pantalla de acceso restringido para cualquier rol distinto de Director (HTTP 403 en backend + redirección en frontend).
+- El drill-down de líneas analíticas se activa bajo demanda, sin cargar los datos hasta que el usuario lo solicita explícitamente.

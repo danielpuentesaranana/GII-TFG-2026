@@ -64,3 +64,51 @@ Por último, el paquete Modelos contiene las entidades del dominio que represent
 | Diagrama | Código Fuente |
 |----------|---------------|
 |![RecibirRespuesta](./DdC/imagen/CompletarFormulario.png)|[Ver Código](./DdC/codigo/CompletarFormulario.puml)
+
+## Decisión Tecnológica
+
+Dado que el sistema se basa en la gestión automática de solicitudes a partir de correos electrónicos, se ha optado por utilizar herramientas del ecosistema Microsoft, concretamente Power Automate, Outlook y Power BI.
+
+Esta decisión está alineada con el entorno tecnológico de la organización, ya que Telefónica trabaja de forma habitual con soluciones de Microsoft. En particular, el buzón de correo utilizado para la gestión de solicitudes se encuentra en Outlook, lo que facilita la integración directa del sistema con los procesos existentes sin necesidad de introducir nuevas herramientas o plataformas externas.
+
+Por un lado, Power Automate se utiliza como núcleo del sistema, ya que permite automatizar el procesamiento de los correos entrantes, aplicar lógica de decisión y coordinar las acciones necesarias sin necesidad de desarrollar una aplicación desde cero. Frente al desarrollo de una solución web tradicional, esta alternativa presenta ventajas significativas en términos de tiempo. El desarrollo de una aplicación web en el entorno corporativo requiere la aprobación por parte de gerencia, la validación del presupuesto y el cumplimiento de estrictos requisitos de seguridad, lo que puede alargar el proceso hasta aproximadamente seis meses. En este caso, se prioriza la rapidez de desarrollo, dado que la necesidad del sistema está directamente relacionada con el proceso de ERE previsto para el 1 de marzo. Por ello, se opta por una solución basada en automatización que permite una implementación mucho más ágil.
+
+Outlook se emplea como punto de entrada y salida de información, siendo el canal a través del cual los usuarios envían solicitudes y reciben respuestas. Esto permite integrarse directamente con el flujo de trabajo existente en la organización, evitando cambios en la forma de interacción de los usuarios.
+
+Por otro lado, Power BI se utiliza para la consulta y visualización de datos, facilitando la creación de vistas que permiten al personal técnico acceder a la información de las solicitudes pendientes de forma estructurada. Además, esta herramienta ya se utiliza en otros ámbitos dentro de la organización, por lo que no es necesario adquirir nuevas licencias, lo que reduce el coste de la solución.
+
+En cuanto a la gestión de datos, la solución ideal pasaría por la utilización de Dataverse como base de datos dentro del ecosistema Microsoft. Sin embargo, la creación y configuración de este entorno requiere un proceso adicional. Por este motivo, y como solución temporal, se emplea Power BI como repositorio intermedio de datos, permitiendo almacenar y consultar la información mientras se completa la infraestructura definitiva.
+
+## Diseño 
+
+### Diagrama de Clases de Diseño
+| Diagrama | Código Fuente |
+|----------|---------------|
+|![Diagrama Clases Diseño](./DdC_Diseno/imagen/Diagrama_Clases_Diseno.png)|[Ver Código](./DdC_Diseno/codigo/Diagrama_Clases_Diseno.puml)
+
+### Diagramas de Secuencia por Caso de Uso 
+
+#### Enviar Solicitud
+| Diagrama | Código Fuente |
+|----------|---------------|
+|![Diagrama Secuencia](./DdS/imagen/EnviarSolicitud.png)|[Ver Código](./DdS/codigo/EnviarSolicitud.puml)
+
+#### Recibir Respuesta
+| Diagrama | Código Fuente |
+|----------|---------------|
+|![Diagrama Secuencia](./DdS/imagen/RecibirRespuesta.png)|[Ver Código](./DdS/codigo/RecibirRespuesta.puml)
+
+#### Ver Solicitudes Pendientes
+| Diagrama | Código Fuente |
+|----------|---------------|
+|![Diagrama Secuencia](./DdS/imagen/VerSolicitudesPendientes.png)|[Ver Código](./DdS/codigo/VerSolicitudesPendientes.puml)
+
+#### Actualizar Estado
+| Diagrama | Código Fuente |
+|----------|---------------|
+|![Diagrama Secuencia](./DdS/imagen/ActualizarEstado.png)|[Ver Código](./DdS/codigo/ActualizarEstado.puml)
+
+#### Completar Formulario
+| Diagrama | Código Fuente |
+|----------|---------------|
+|![Diagrama Secuencia](./DdS/imagen/CompletarFormulario.png)|[Ver Código](./DdS/codigo/CompletarFormulario.puml)

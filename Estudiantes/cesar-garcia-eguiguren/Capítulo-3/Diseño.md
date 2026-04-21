@@ -1,4 +1,4 @@
-# 5. Diseño de la Arquitectura
+# Disciplina de Diseño
 
 ## Índice
 
@@ -26,6 +26,8 @@
    - 9.3 [WF-03 — Panel de métricas (CU-10 y otras métricas)](#wf-03--panel-de-métricas-cu-10-y-otras-métricas)
    - 9.4 [WF-04 — Panel Manager (CU-27)](#wf-04--panel-manager-cu-27)
 
+
+## 5. Diseño de la Arquitectura
 ### 5.1 Patrón arquitectónico
 
 El sistema materializa una **arquitectura por capas de cuatro niveles** en el backend, complementada con un frontend SPA desacoplado. Aunque la terminología MVC es utilizada como herramienta de análisis para clasificar las clases, la estructura de implementación va más allá del MVC clásico de tres niveles por razones de complejidad del dominio analítico.

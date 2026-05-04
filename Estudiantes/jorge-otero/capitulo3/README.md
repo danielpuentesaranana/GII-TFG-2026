@@ -86,7 +86,9 @@ La clase *Solicitud* recoge los datos principales asociados a cada petición y c
 
 De este modo, la vista integra información operativa y analítica, permitiendo al técnico no solo consultar el estado de las solicitudes, sino también obtener una visión global del comportamiento del sistema.
 
-## Decisión Tecnológica
+## Diseño 
+
+### Decisión Tecnológica
 
 | Diagrama | Código Fuente |
 |----------|---------------|
@@ -104,22 +106,75 @@ Finalmente, **Power BI** proporciona la capa de visualización a través de la v
 
 De este modo, la arquitectura separa claramente la captura de eventos, el procesamiento automático, la integración con servicios externos, el almacenamiento de la información y su posterior visualización, garantizando una solución modular y coherente con un sistema orientado a eventos.
 
-## Diseño 
-
 ### Diagrama de Clases de Diseño
 | Diagrama | Código Fuente |
 |----------|---------------|
 |![Diagrama Clases Diseño](./DdC_Diseno/imagen/Diagrama_Clases_Diseno.png)|[Ver Código](./DdC_Diseno/codigo/Diagrama_Clases_Diseno.puml)
 
-En el paquete de **Interfaces** se incluyen las clases que representan los puntos de entrada y salida del sistema. La clase *CorreoExchangeOnline* modela la información recibida desde el buzón corporativo, mientras que *FormularioMicrosoftForms* representa los datos recogidos a través de formularios. Por su parte, *SolicitudesViewPowerBI* actúa como la capa de visualización, permitiendo consultar la información almacenada en el sistema.
+En primer lugar, los **controladores**, representados por *RecibirSolicitudFlow* y *RecibirFormularioFlow*, modelan los flujos implementados en Power Automate. Estos se encargan de orquestar la lógica del sistema. El flujo *RecibirSolicitudFlow* procesa los correos electrónicos entrantes, analiza su contenido para identificar la intención, extrae información relevante como el número de solicitud, consulta los datos necesarios y genera una respuesta adecuada. Además, registra tanto el correo recibido como la solicitud en el sistema. Por su parte, *RecibirFormularioFlow* gestiona los formularios enviados por los usuarios, validando la documentación aportada, registrando la información y actualizando el estado de la solicitud correspondiente. En caso necesario, también envía instrucciones adicionales al usuario.
 
-En la capa de **Controladores** se definen las clases *RecibirSolicitudController* y *RecibirFormularioController*, encargadas de gestionar la lógica de negocio. Estas clases se activan a partir de eventos externos y coordinan el procesamiento de la información, delegando en los modelos y servicios necesarios para completar cada flujo.
+Las **entidades del dominio** incluyen las clases *CorreoRecibido*, *Solicitud* y *Formulario*, que representan los principales elementos de información gestionados por el sistema. Estas clases encapsulan los datos relevantes de cada elemento y permiten estructurar la información de forma coherente. Existe una relación entre *Solicitud* y *Formulario*, donde una solicitud puede estar asociada a múltiples formularios, reflejando el ciclo de vida del proceso.
 
-El paquete de **Modelos** contiene las entidades principales del sistema. La clase *Solicitud* representa la información operativa asociada a cada petición, incluyendo datos relevantes para su análisis y gestión. La clase *Formulario* recoge la información adicional proporcionada por el usuario, vinculada a una solicitud concreta. Por otro lado, la clase *CorreoRecibido* mantiene un histórico independiente de los correos procesados, almacenando información como la fecha de recepción y la intención detectada, lo que permite realizar análisis estadísticos del volumen y tipología de solicitudes.
+El bloque de **acceso a datos** está compuesto por dos clases que representan los datasets de Power BI utilizados en la solución. *DatasetConsultaPowerBI* se emplea como fuente de información, permitiendo realizar consultas mediante DAX para obtener datos necesarios durante el procesamiento. Por otro lado, *DatasetRegistroPowerBI* actúa como repositorio de almacenamiento, donde se registran las solicitudes, formularios y correos procesados, además de permitir la actualización de la información existente.
 
-En el paquete de **Servicios Externos** se agrupan las clases que representan las integraciones con sistemas externos. *ExchangeOnlineService* gestiona la interacción con el correo electrónico, *MicrosoftFormsService* permite acceder a los datos de los formularios, y *BaseDatos* se utiliza para la consulta de información adicional necesaria durante el procesamiento. Finalmente, *RepositorioDatos* actúa como capa de persistencia, centralizando el almacenamiento y recuperación de las entidades del sistema.
+Por último, las **interfaces externas** incluyen los sistemas con los que la solución interactúa. *ExchangeOnline* gestiona la recepción y envío de correos electrónicos, mientras que *MicrosoftForms* permite la recepción de formularios y la obtención de sus respuestas. La clase *InformePowerBI* representa la capa de visualización, encargada de mostrar la información almacenada mediante informes y paneles interactivos.
 
-Las relaciones entre clases reflejan el flujo de información: los controladores reciben datos de las interfaces, interactúan con los modelos y utilizan los servicios externos para completar el procesamiento. La vista en Power BI accede directamente al repositorio de datos, sin necesidad de un controlador intermedio, lo que simplifica la arquitectura en la capa de consulta.
+### Modelo de Datos
+
+| Diagrama | Código Fuente |
+|----------|---------------|
+|![ModeloDaos](./ModeloDatos/ModeloDatos.png)|[Ver Código](./ModeloDatos/ModeloDatos.puml)
+
+El modelo de datos del sistema está implementado en Power BI mediante un modelo tabular, el cual permite almacenar, estructurar y analizar la información procesada por los flujos automatizados. Aunque Power BI se utiliza habitualmente como herramienta de visualización, en este caso también actúa como repositorio de datos.
+
+El modelo se compone de tres tablas principales:
+
+#### Tabla `Numero`
+Esta tabla representa la entidad principal del sistema, donde se almacena la información asociada a cada solicitud. Cada registro está identificado de manera única mediante el atributo `numero`, que actúa como clave primaria.
+
+Incluye atributos como:
+- Tipo de solicitud
+- Provincia
+- Técnico responsable
+- Empresa colaboradora (EECC)
+- Número total de consultas
+
+#### Tabla `Formulario`
+Esta tabla contiene los formularios asociados a cada solicitud. Recoge información detallada sobre cada interacción, incluyendo:
+- Tipo de formulario
+- Estado
+- Fechas de entrada y resolución
+- Tipo de peticionario
+- Motivos de reclamación o desacuerdo
+- Información adicional proporcionada
+
+El atributo `numero` actúa como clave foránea, permitiendo relacionar cada formulario con su solicitud correspondiente.
+
+#### Tabla `TotalEmail`
+Esta tabla almacena un histórico de los correos electrónicos que llegan al sistema. Para cada correo se registra:
+- La intención detectada
+- La fecha de entrada
+
+Su finalidad es permitir el análisis del volumen y tipo de correos recibidos.
+
+#### Relaciones
+
+La única relación existente en el modelo se establece entre las tablas `Numero` y `Formulario`.
+
+- Tipo de relación: **uno a cero o muchos (1:0..N)**
+- Interpretación:
+  - Una solicitud puede no tener formularios asociados o tener varios.
+  - Cada formulario pertenece a una única solicitud.
+
+La tabla `TotalEmail` no presenta relaciones con el resto del modelo, ya que su función es servir como histórico independiente de la actividad del buzón.
+
+El modelo presenta una estructura sencilla pero adecuada para los objetivos del sistema. Permite:
+- Asociar múltiples formularios a una misma solicitud
+- Realizar análisis históricos
+- Explotar la información mediante medidas y visualizaciones en Power BI
+
+Además, la separación de la tabla `TotalEmail` permite analizar de forma independiente el comportamiento de los correos entrantes sin afectar al resto del modelo.
+
 
 ### Diagramas de Secuencia por Caso de Uso 
 
@@ -163,3 +218,123 @@ El repositorio devuelve los datos correspondientes a las distintas entidades del
 Finalmente, la vista presenta la información al técnico de forma estructurada, permitiendo su consulta y análisis. Este proceso se realiza sin intervención de una capa de control intermedia, ya que Power BI accede directamente a los datos almacenados.
 
 De este modo, el diagrama refleja un flujo simple centrado en la recuperación y visualización de la información, diferenciándose de los otros casos de uso por la ausencia de procesamiento complejo y por su carácter exclusivamente consultivo.
+
+### Diseño de la Implementación
+
+#### Flujo Recibir Correo
+
+El flujo se activa mediante un disparador asociado al buzón corporativo. Una vez recibido el correo, se ejecutan distintas fases:
+
+1. Lectura del correo
+   - Obtener asunto
+   - Obtener remitente
+   - Obtener cuerpo
+
+2. Identificación del tipo de mensaje (según asunto)
+   - Cambio de estado del formulario
+   - Mover a carpeta "Documentación"
+   - Análisis del correo por IA
+
+3. Extracción de información
+   - Números de solicitud
+   - Intención del correo
+     - No requiere consulta
+       - Respuesta mediante plantilla
+     - Requiere consulta
+       - Continuar flujo
+
+4. Iteración por cada número extraído
+   - Para cada número:
+
+     4.1 Consulta en base de datos correspondiente
+     - Actuaciones (ACT)
+     - Wepes (EXP)
+     - Petter (PET)
+
+     4.2 Resultado de la consulta
+     - Si existen datos:
+       - Procesar los datos obtenidos
+       - Añadir información a la variable textoCorreo
+       - Guardar la información en la base de datos (Solicitud)
+       - Continuar con el siguiente número
+     - Si no existen datos:
+       - Marcar como no encontrado
+
+5. Gestión de resultados globales
+   - Calcular números encontrados
+   - Generar mensaje para no encontrados (si aplica)
+
+6. Gestión de alertas
+   - Añadir texto en caso de situaciones de riesgo
+
+7. Construcción del correo
+   - Formar contenido final (textoCorreo)
+
+8. Envío del correo
+   - Enviar respuesta al remitente
+
+9. Post-procesado
+   - Mover correo a carpeta "Archivo"
+
+
+#### Flujo Recibir Formulario
+
+1. Recepción del formulario
+   - Entrada de la respuesta del formulario en el sistema
+
+2. Validación del contenido
+   - Comprobar si se ha marcado la opción "Documentación"
+
+   - Si SÍ requiere documentación:
+     - Enviar correo indicando los pasos a seguir para completar la documentación
+
+   - Si NO requiere documentación:
+     - Registrar el formulario en la base de datos
+       - Número de solicitud
+       - Tipo de formulario
+       - Estado
+       - Resto de datos asociados
+
+
+#### Vista y Análisis en Power BI
+
+La visualización en Power BI permite analizar la información registrada en el sistema a partir de las tablas Numero y Formulario.
+
+1. Carga de datos
+   - Lectura de las tablas Numero y Formulario
+   - Aplicación de relaciones (1:0..N)
+   - Preparación del modelo para análisis
+
+2. Actualización de datos
+   - Datos actualizados desde los flujos de Power Automate
+   - Refresco de las visualizaciones
+
+3. Construcción de la vista
+   - Uso de la tabla Numero como base
+   - Relación con Formulario para detalle
+   - Visualización por solicitud
+
+4. Cálculo de métricas
+   - Para cada número:
+
+     4.1 Formularios pendientes
+     - Conteo de formularios con estado "Pendiente"
+
+     4.2 Formularios resueltos
+     - Conteo de formularios con estado "Resuelto"
+
+     4.3 Reclamaciones por falta de fecha
+     - Conteo de formularios con motivo "Falta de previsión"
+
+     4.4 Reclamaciones por exceso de tiempo
+     - Conteo de formularios con motivo "Incumplimiento de tiempo"
+
+5. Representación de resultados
+   - Visualización por solicitud
+   - Agregación de métricas
+   - Análisis del estado e incidencias
+
+6. Uso de la información
+   - Seguimiento de solicitudes
+   - Detección de incidencias
+   - Apoyo a la toma de decisiones

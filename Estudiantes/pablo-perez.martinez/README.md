@@ -51,6 +51,9 @@
 
 ##### [Análisis](./Capitulo3/Analisis.md)
 
+##### [Diseño](./Capitulo3/Diseño.md)
+
+
 
 #### 5. Descripción de la solución propuesta
 

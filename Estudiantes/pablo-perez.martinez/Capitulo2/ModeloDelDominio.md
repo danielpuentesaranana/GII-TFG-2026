@@ -11,19 +11,19 @@ En este caso, el dominio se sitúa en el entorno de producción de Visual Tracki
 
 ## Diagrama de objetos
 #### OEE en gráfica de barra horizontal
-![Diagrama de objetos 1](./imagenes/.svg)
+![Diagrama de objetos 1](./imagenes/diagramaDeObjetosOEE.svg)
 
 #### Rendimiento en tabla comparativa
-![Diagrama de objetos 2](./imagenes/.svg)
+![Diagrama de objetos 2](./imagenes/diagramaDeObjetosRendimiento.svg)
 
 ## Diagrama de estados de partición
-![Diagrama de objetos](./imagenes/.svg)
+![Diagrama de objetos](./imagenes/diagramaDeEstadosParticion.svg)
 
 ## Diagrama de estados de gráfica
-![Diagrama de objetos](./imagenes/.svg)
+![Diagrama de objetos](./imagenes/diagramaDeEstadosGrafica.svg)
 
 ## Diagrama de actividad
-![Diagrama de actividad](./imagenes/diagramaDeActividad.svg)
+![Diagrama de actividad](./imagenes/diagramaActividad.svg)
 
 
 

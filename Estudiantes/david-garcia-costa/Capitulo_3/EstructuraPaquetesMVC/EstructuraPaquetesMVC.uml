@@ -2,9 +2,9 @@
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-title Estructura de paquetes MVC - kiwi-mvc
+title Estructura de paquetes MVC - app
 
-package "kiwi-mvc" {
+package "app" {
 
   package "Vista" {
     package "public" {

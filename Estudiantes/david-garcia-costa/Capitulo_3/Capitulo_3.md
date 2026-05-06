@@ -6,7 +6,7 @@
 
 ### Explicación
 
-El subsistema `kiwi-mvc` utiliza modelos Mongoose para definir las colecciones principales almacenadas en MongoDB. Estos modelos forman la capa Modelo del patrón MVC.
+El subsistema `app` utiliza modelos Mongoose para definir los esquemas de colecciones principales almacenadas en MongoDB. Estos modelos forman la capa Modelo del patrón MVC.
 
 Cada clase del diagrama representa una colección funcional del sistema:
 
@@ -26,13 +26,13 @@ Este diagrama se mantiene sin propiedades ni relaciones porque su objetivo es of
 
 ### Explicación
 
-`kiwi-mvc` está implementado como una Single Page Application. El servidor Express sirve `public/index.html`, y la lógica de interfaz se encuentra en `public/js/app.js`.
+`app` está implementado como una Single Page Application. El servidor Express sirve `public/index.html`, y la lógica de interfaz se encuentra en `public/js/app.js`.
 
-Las vistas representan secciones funcionales de la aplicación, no páginas renderizadas individualmente por el servidor. Cada vista consume la API REST de `kiwi-mvc` y se comunica con los controladores correspondientes.
+Las vistas representan secciones funcionales de la aplicación, no páginas renderizadas individualmente por el servidor. Cada vista consume la API REST de `app` y se comunica con los controladores correspondientes.
 
 La autenticación se realiza mediante `LoginView`, conectada con `AuthController`. Después, el usuario trabaja con sesiones, documentación, casos de uso, requisitos, escenarios y borradores.
 
-El modo automático se activa desde `AutomaticModeView`, que utiliza `SessionController` para hacer el handoff hacia `Agent_ApiKiwi`.
+El modo automático se activa desde `AutomaticModeView`, que utiliza `SessionController` para hacer el handoff hacia `agent`.
 
 ## 3. Controladores
 
@@ -40,7 +40,7 @@ El modo automático se activa desde `AutomaticModeView`, que utiliza `SessionCon
 
 ### Explicación
 
-Los controladores reciben las peticiónes HTTP definidas en `src/routes/index.js`, validan la información recibida, interactúan con modelos o servicios y devuelven respuestas JSON al frontend.
+Los controladores reciben las peticiones HTTP definidas en `src/routes/index.js`, validan la información recibida, interactúan con modelos o servicios y devuelven respuestas JSON al frontend.
 
 Los principales controladores son:
 
@@ -52,13 +52,13 @@ Los principales controladores son:
 - `GherkinController`: gestiona escenarios Gherkin.
 - `DraftController`: gestiona borradores, feedback, rechazo y publicación.
 
-La autenticación interna de `kiwi-mvc` se integra dentro de `AuthController`. Las contraseñas se almacenan con hash mediante `bcryptjs`, y las sesiones HTTP se guardan en MongoDB mediante `connect-mongo`, en la colección técnica `httpSessions`.
+La autenticación interna de `app` se integra dentro de `AuthController`. Las contraseñas se almacenan con hash mediante `bcryptjs`, y las sesiones HTTP se guardan en MongoDB mediante `connect-mongo`, en la colección técnica `httpSessions`.
 
 ### Servicios auxiliares
 
 Aunque la aplicación sigue un patrón MVC, parte de la lógica de negocio se desacopla de los controladores mediante servicios auxiliares ubicados en `src/services`. Estos servicios encapsulan operaciones reutilizables, reglas de negocio transversales, generación de identificadores, trazabilidad y comunicación con sistemas externos.
 
-Los principales servicios del subsistema `kiwi-mvc` son:
+Los principales servicios del subsistema `app` son:
 
 - `AuthService`: centraliza operaciones auxiliares de autenticación y sesión.
 - `SessionService`: concentra la lógica asociada al ciclo de vida de las sesiones de trabajo y al ensamblado de resultados.
@@ -66,13 +66,25 @@ Los principales servicios del subsistema `kiwi-mvc` son:
 - `GherkinService`: encapsula operaciones auxiliares relacionadas con escenarios Gherkin.
 - `IdentifierService`: genera identificadores lógicos como `ucId` y `rfId`, usados para trazabilidad funcional.
 - `TraceabilityService`: construye y mantiene relaciones de trazabilidad entre documentación, casos de uso, requisitos y escenarios.
-- `ManualKiwiService`: integra `kiwi-mvc` con `Kiwi TCMS` mediante XML-RPC para publicar casos de prueba.
+- `ManualKiwiService`: integra `app` con `Kiwi TCMS` mediante XML-RPC para publicar casos de prueba.
 
 La presencia de esta capa intermedia mejora la mantenibilidad del sistema porque evita sobrecargar los controladores con lógica extensa y permite reutilizar comportamiento en varios flujos. Además, hace explícita la separación entre acceso HTTP, lógica de aplicación, persistencia MongoDB e integraciones externas.
 
+### Justificación de decisiones de diseño
+
+Se mantiene una arquitectura MVC porque encaja con la separación natural del subsistema `app`: la vista concentra la interacción del usuario, los controladores exponen los casos de uso mediante API REST y los modelos representan las entidades persistentes del dominio. Esta decisión facilita localizar responsabilidades y evita mezclar interfaz, reglas de negocio y persistencia en un mismo punto.
+
+La capa de servicios se incorpora como apoyo al patrón MVC para encapsular operaciones que no pertenecen estrictamente a un único controlador, como la generación de identificadores, la trazabilidad entre artefactos, el ensamblado de borradores o la publicación en Kiwi TCMS. De esta forma, los controladores quedan orientados a recibir peticiones, validar datos y coordinar el flujo, mientras que la lógica reutilizable queda en módulos específicos.
+
+MongoDB se utiliza como persistencia principal del sistema desarrollado porque los artefactos funcionales manejados por la aplicación tienen una estructura documental y evolucionan durante la sesión de trabajo. Mongoose permite definir esquemas, validaciones e índices manteniendo flexibilidad para representar documentación, casos de uso, requisitos, escenarios y borradores.
+
+El subsistema `agent` se separa en una aplicación FastAPI para aislar el flujo automático basado en agentes del flujo manual de `app`. La comunicación entre ambos se limita a un handoff HTTP, lo que reduce el acoplamiento entre tecnologías y permite que el modo manual siga funcionando aunque el subsistema automático no esté disponible.
+
+La integración con Kiwi TCMS se encapsula mediante XML-RPC y no accede directamente a MariaDB. Esta decisión mantiene a Kiwi como sistema externo, respeta su API pública y evita depender de su modelo interno de base de datos.
+
 ### Rutas principales de la API
 
-La entrada HTTP del subsistema `kiwi-mvc` se centraliza en `src/routes/index.js`. Este módulo define las rutas REST consumidas por la SPA y las asocia con el controlador correspondiente, aplicando cuando procede el middleware de autenticación `auth.js`.
+La entrada HTTP del subsistema `app` se centraliza en `src/routes/index.js`. Este módulo define las rutas REST consumidas por la SPA y las asocia con el controlador correspondiente, aplicando cuando procede el middleware de autenticación `auth.js`.
 
 La organización por rutas permite desacoplar la navegación del frontend de la implementación interna de cada controlador. Las rutas reales identificadas en el proyecto son las siguientes:
 
@@ -120,9 +132,9 @@ La organización por rutas permite desacoplar la navegación del frontend de la 
 | `PUT` | `/api/sessions/:id` | `SessionController` | Actualizar una sesión. |
 | `DELETE` | `/api/sessions/:id` | `SessionController` | Eliminar una sesión. |
 | `POST` | `/api/sessions/:id/results` | `SessionController` | Guardar resultados intermedios o finales de una sesión. |
-| `POST` | `/api/sessions/:id/handoff-to-agent` | `SessionController` | Transferir una sesión manual al subsistema automático `Agent_ApiKiwi`. |
-| `POST` | `/api/kiwi-mvc/handoff` | `Agent_ApiKiwi` | Preparar o lanzar el handoff desde el subsistema automático. |
-| `GET` | `/healthz` | `Agent_ApiKiwi` | Comprobar el estado básico del servicio automático. |
+| `POST` | `/api/sessions/:id/handoff-to-agent` | `SessionController` | Transferir una sesión manual al subsistema automático `agent`. |
+| `POST` | `/api/kiwi-mvc/handoff` | `agent` | Preparar o lanzar el handoff desde el subsistema automático. |
+| `GET` | `/healthz` | `agent` | Comprobar el estado básico del servicio automático. |
 
 Estas rutas muestran cómo la capa Controlador no se limita a exponer operaciones CRUD simples, sino que implementa flujos de negocio completos como la extracción automática desde documentación, el ensamblado de borradores, la publicación en un sistema externo o el traspaso de una sesión al subsistema automático.
 
@@ -220,7 +232,7 @@ Este caso se satisface con `POST /api/drafts/assemble`. El controlador ensambla 
 
 Este caso de uso se satisface con `POST /api/drafts/:id/publish`. El controlador recupera el borrador, llama al servicio de publicación y este se autentica en Kiwi TCMS mediante XML-RPC para crear el caso de prueba con `TestCase.create`.
 
-## 5. MongoDB: colecciones reales como JSON/BSON
+## 5. MongoDB: esquemas de colecciones reales como JSON/BSON
 
 ### `users`
 
@@ -244,7 +256,7 @@ Este caso de uso se satisface con `POST /api/drafts/:id/publish`. El controlador
   "name": "String",
   "description": "String",
   "projectName": "String",
-  "workflowMode": "pendiente | manual | automático",
+  "workflowMode": "pendiente | manual | automatico",
   "status": "activa | completada",
   "currentStep": "Number",
   "agentAppUrl": "String",
@@ -265,6 +277,23 @@ Este caso de uso se satisface con `POST /api/drafts/:id/publish`. El controlador
   "updatedAt": "Date"
 }
 ```
+
+### Ciclo de vida de una sesión
+
+La entidad `Session` actúa como contenedor lógico del proceso de trabajo. Una sesión agrupa la documentación funcional introducida por el usuario y todos los artefactos derivados de ella.
+
+El ciclo de vida de una sesión es:
+
+1. Creación de la sesión.
+2. Carga de documentación funcional.
+3. Extracción o creación de casos de uso.
+4. Extracción o creación de requisitos funcionales.
+5. Generación de escenarios Gherkin.
+6. Creación de borradores de casos de prueba.
+7. Revisión, aceptación o rechazo.
+8. Publicación en Kiwi TCMS.
+
+De este modo, la sesión permite mantener la trazabilidad entre documentación, casos de uso, requisitos, escenarios, borradores y casos publicados.
 
 ### `documentations`
 
@@ -419,13 +448,13 @@ Este caso de uso se satisface con `POST /api/drafts/:id/publish`. El controlador
 
 ### Explicación
 
-Estas son las colecciones reales utilizadas por `kiwi-mvc`. La clave primaria real en todas las colecciones funcionales es `_id`.
+Estos son los esquemas de colecciones reales utilizados por `app`. La clave primaria real en todos los esquemas de colecciones funcionales es `_id`.
 
-Las referencias mediante `ObjectId` representan relaciones documentales entre colecciones. En cambio, campos como `ucId` y `rfId` son identificadores funcionales de trazabilidad, no claves primarias físicas.
+Las referencias mediante `ObjectId` representan relaciones documentales entre esquemas de colecciones. En cambio, campos como `ucId` y `rfId` son identificadores funcionales de trazabilidad, no claves primarias físicas.
 
 La colección `httpSessions` no representa una entidad del dominio. Es una colección técnica generada por `connect-mongo` para almacenar las sesiones HTTP de Express.
 
-En este proyecto, `MongoDB` sí forma parte del sistema diseñado e implementado. Es la base de datos principal de `kiwi-mvc` y donde residen las colecciones funcionales del dominio.
+En este proyecto, `MongoDB` sí forma parte del sistema diseñado e implementado. Es la base de datos principal de `app` y donde residen los esquemas de colecciones funcionales del dominio.
 
 
 ## 6. JSON utilizados por los agentes
@@ -435,19 +464,24 @@ En este proyecto, `MongoDB` sí forma parte del sistema diseñado e implementado
 ```json
 {
   "drafts": {
-    "UC-01": {
+    "summary::project::document": {
       "summary": "String",
       "category_name": "String",
       "gherkin_text": "String",
+      "meta": {
+        "project_name": "String",
+        "source_session_id": "String",
+        "source_documents": []
+      },
       "status": "pending | published | rejected",
       "version": "Number",
       "created_at": "DateTime",
       "updated_at": "DateTime",
+      "timezone": "String",
       "user_feedback": [
         {
           "text": "String",
-          "created_at": "DateTime",
-          "done": "Boolean"
+          "ts_iso": "DateTime"
         }
       ],
       "published_result": {
@@ -466,51 +500,64 @@ En este proyecto, `MongoDB` sí forma parte del sistema diseñado e implementado
     }
   ],
   "use_cases": {
-    "UC-01": {
-      "uc_id": "String",
+    "UC-01::project": {
+      "id": "String",
       "name": "String",
-      "description": "String",
-      "project_name": "String"
+      "project_name": "String",
+      "document_label": "String",
+      "notes": [],
+      "metadata": {},
+      "version": "Number"
     }
   },
   "functional_requirements": {
-    "RF-01": {
-      "rf_id": "String",
+    "RF-01::project": {
+      "id": "String",
       "text": "String",
       "uc_id": "String",
-      "priority": "String",
-      "source_quote": "String"
+      "project_name": "String",
+      "source_quote": "String",
+      "notes": [],
+      "metadata": {},
+      "version": "Number"
     }
+  },
+  "project_context": {
+    "source_session_id": "String",
+    "project_name": "String",
+    "source_documents": [],
+    "updated_at": "DateTime"
   }
 }
 ```
 
 ### Explicación
 
-`Agent_ApiKiwi` utiliza `kiwi_drafts.json` como persistencia local de desarrollo para guardar los artefactos generados por los agentes.
+`agent` utiliza `kiwi_drafts.json` como persistencia local de desarrollo para guardar los artefactos generados por los agentes. La ruta concreta del fichero puede configurarse mediante `DRAFTS_PATH`; si no se define, el sistema lo crea en el directorio temporal del sistema operativo.
 
-El fichero contiene cuatro bloques principales:
+El fichero contiene cinco bloques principales:
 
 - `drafts`: borradores generados por el pipeline automático.
 - `documentation_refs`: referencias a documentos procesados.
 - `use_cases`: casos de uso extraídos por IA.
 - `functional_requirements`: requisitos funcionales extraídos por IA.
+- `project_context`: contexto del proyecto y de la sesión origen de `app`, utilizado para mantener la trazabilidad durante el flujo automático.
 
 Junto con `MongoDB`, este `JSON` sí pertenece al sistema desarrollado. En concreto, representa una persistencia auxiliar propia del subsistema automático durante el entorno de desarrollo.
 
 En producción, este JSON no debería residir dentro de la aplicación. Debería sustituirse por un almacenamiento externo o repositorio de artefactos.
 
-## 7. Agentes: construcción interna de Agent_ApiKiwi
+## 7. Agentes: construcción interna de agent
 
 ![Agentes](./Agentes/Agentes.svg)
 
 ### Explicación
 
-`Agent_ApiKiwi` está construido como una aplicación FastAPI integrada con Google ADK. Su punto de entrada principal para `kiwi-mvc` es:
+`agent` está construido como una aplicación FastAPI integrada con Google ADK. Su punto de entrada principal para `app` es:
 
 `POST /api/kiwi-mvc/handoff`
 
-Cuando recibe una sesión de `kiwi-mvc`, crea una sesión propia del runtime ADK y ejecuta el orquestador principal `kiwi_orchestrator`.
+Cuando recibe una sesión de `app`, crea una sesión propia del runtime ADK y ejecuta el orquestador principal `kiwi_orchestrator`.
 
 El orquestador puede invocar la herramienta `get_kiwimvc_session_docs`, que lee en modo solo lectura la colección `documentations` de MongoDB. A partir de ahí, delega el trabajo en agentes especializados:
 
@@ -526,6 +573,33 @@ Las herramientas proporcionan capacidades concretas:
 - `draft_store.py`: lectura/escritura del JSON de artefactos.
 - `kiwi_api.py`: publicación en Kiwi TCMS.
 
+### Decisiones de diseño del sistema multiagente
+
+La división en agentes especializados evita concentrar toda la lógica en un único agente. Cada agente tiene una responsabilidad concreta dentro del proceso, lo que facilita el mantenimiento, la reutilización y la modificación de prompts o herramientas sin afectar al resto del sistema.
+
+El agente `kiwi_orchestrator` actúa como agente principal. Su función es coordinar el flujo completo, recibir el contexto de la sesión procedente de `app`, recuperar la documentación funcional y delegar el trabajo en los agentes especializados.
+
+El agente `draft_pipeline_agent` organiza el proceso de generación automática como un flujo secuencial. Primero se ejecuta la extracción de casos de uso y requisitos funcionales, y después se generan los escenarios Gherkin y borradores de prueba. Esta decisión evita generar escenarios sin disponer previamente de los artefactos funcionales necesarios.
+
+Las herramientas utilizadas por los agentes encapsulan el acceso a recursos externos. De este modo, los agentes no acceden directamente a todos los sistemas, sino que utilizan funciones específicas para leer documentación desde MongoDB, almacenar artefactos en JSON o publicar casos de prueba en Kiwi TCMS mediante XML-RPC.
+
+### Trazabilidad y control de generación
+
+La documentación recuperada desde MongoDB se utiliza como fuente de entrada para extraer casos de uso y requisitos funcionales.
+
+A partir de estos elementos se generan escenarios Gherkin y borradores de casos de prueba. La relación funcional puede resumirse de la siguiente forma:
+
+`Documentation → UseCase → FunctionalRequirement → GherkinScenario → Draft → TestCase`
+
+Los identificadores `ucId` y `rfId` permiten relacionar los artefactos entre sí y conservar el origen funcional de cada escenario o borrador generado.
+
+
+### Revisión humana antes de publicación (Human-in-the-loop)
+
+El sistema incorpora un enfoque de revisión humana antes de la publicación definitiva en Kiwi TCMS. Los borradores generados por el sistema multiagente pueden ser revisados, aceptados o rechazados antes de ser enviados al sistema externo.
+
+Este diseño evita que los resultados generados por el modelo LLM se publiquen sin supervisión, permite corregir posibles errores y mejora la calidad final de los casos de prueba registrados.
+
 ## 8. Bases de datos externas o no diseñadas por el sistema
 
 En esta sección se describen persistencias que aparecen en la arquitectura, pero que no forman parte de la base de datos diseñada en este trabajo. Las persistencias propias del sistema son `MongoDB` y el `JSON` de artefactos del subsistema automático en desarrollo.
@@ -538,7 +612,7 @@ En esta sección se describen persistencias que aparecen en la arquitectura, per
 
 MariaDB pertenece a Kiwi TCMS. No es una base de datos creada ni gestionada por el sistema desarrollado.
 
-`kiwi-mvc` y `Agent_ApiKiwi` no acceden directamente a estas tablas. La comunicación se realiza mediante la API XML-RPC de Kiwi TCMS.
+`app` y `agent` no acceden directamente a estas tablas. La comunicación se realiza mediante la API XML-RPC de Kiwi TCMS.
 
 Por tanto, MariaDB no forma parte del modelo de datos diseñado en este trabajo. Es una persistencia interna de un sistema externo.
 
@@ -559,7 +633,7 @@ Tablas relevantes:
 
 #### Explicación
 
-SQLite es utilizada internamente por Google ADK dentro de `Agent_ApiKiwi`.
+SQLite es utilizada internamente por Google ADK dentro de `agent`.
 
 No almacena datos funcionales del dominio. No contiene casos de uso, requisitos funcionales ni escenarios Gherkin del sistema principal. Su función es técnica: mantener sesiones, eventos y estado del runtime de agentes.
 
@@ -575,17 +649,17 @@ Tablas principales:
 | `user_states` | Estado por usuario |
 | `adk_internal_metadata` | Metadatos internos |
 
-## 9. Diagrama general del sistema
+## 9. Arquitectura general del sistema
 
-![Diagrama general](./DiagramaGeneralSistema/DiagramaGeneralSistema.svg)
+![Diagrama general](./ArquitecturaGeneralSistema/ArquitecturaGeneralSistema.svg)
 
-## 10. Conexión entre kiwi-mvc y Agent_ApiKiwi
+## 10. Conexión entre app y agent
 
-![Conexión kiwi-mvc y Agent_ApiKiwi](./ConexiónKiwiMvcAgentApiKiwi/ConexiónKiwiMvcAgentApiKiwi.svg)
+![Conexión app y agent](./ConexionKiwiMvcAgentApiKiwi/ConexionKiwiMvcAgentApiKiwi.svg)
 
 ### Explicación
 
-La conexión comienza en `kiwi-mvc` con la ruta:
+La conexión comienza en `app` con la ruta:
 
 `POST /api/sessions/:id/handoff-to-agent`
 
@@ -597,7 +671,7 @@ El body incluye:
 
 ```json
 {
-  "source_session_id": "ObjectId de la sesión de kiwi-mvc",
+  "source_session_id": "ObjectId de la sesión de app",
   "project_name": "nombre del proyecto",
   "session_name": "nombre de la sesión",
   "run_immediately": true
@@ -614,9 +688,9 @@ Después, el orquestador usa `get_kiwimvc_session_docs()` para leer únicamente 
 
 ### Explicación
 
-La publicación se realiza mediante `manualKiwiService`.
+La publicación en Kiwi TCMS puede realizarse desde el flujo manual de `app` o desde el flujo automático de `agent`. En ambos casos se utiliza la API XML-RPC de Kiwi TCMS, evitando el acceso directo a MariaDB.
 
-Primero se ejecuta:
+Hay que loguearse con: 
 
 `Auth.login(username, password)`
 
@@ -641,10 +715,10 @@ La aplicación no escribe directamente en MariaDB. Kiwi TCMS recibe la petición
 
 Antes de enumerar las tecnologías, conviene distinguir claramente las persistencias del sistema de las persistencias externas o técnicas:
 
-- Persistencia propia del sistema desarrollado: `MongoDB` en `kiwi-mvc` y `JSON` de artefactos en `Agent_ApiKiwi` durante desarrollo.
+- Persistencia propia del sistema desarrollado: `MongoDB` en `app` y `JSON` de artefactos en `agent` durante desarrollo.
 - Persistencia externa o no diseñada por el sistema: `MariaDB` de Kiwi TCMS y `SQLite` interna de Google ADK.
 
-### Backend kiwi-mvc
+### Backend app
 
 - `Node.js`: entorno de ejecución del backend.
 - `Express.js`: framework usado para crear la API REST.
@@ -684,18 +758,13 @@ Antes de enumerar las tecnologías, conviene distinguir claramente las persisten
 
 ### Explicación
 
-La estructura de paquetes de `kiwi-mvc` sigue el patrón MVC:
+La estructura de paquetes de `app` sigue el patrón MVC:
 
 - Vista: formada por `public/index.html`, `public/css/app.css` y `public/js/app.js`.
 - Controlador: formado por rutas, middleware y controladores Express.
 - Modelo: formado por esquemas Mongoose.
 - Servicios auxiliares: contienen lógica reutilizable que no pertenece estrictamente al controlador ni al modelo.
-- Configuracion: conexión a MongoDB y carga de variables de entorno compartidas.
-
-
-
-
-
+- Configuración: conexión a MongoDB y carga de variables de entorno compartidas.
 
 
 

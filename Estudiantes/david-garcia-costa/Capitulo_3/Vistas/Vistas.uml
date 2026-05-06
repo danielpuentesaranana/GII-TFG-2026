@@ -3,7 +3,7 @@ skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam classAttributeIconSize 0
 
-title Vistas y Controladores - kiwi-mvc
+title Vistas - app
 
 package "views" {
 

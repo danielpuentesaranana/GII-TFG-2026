@@ -2,9 +2,9 @@
 skinparam packageStyle rectangle
 skinparam shadowing false
 
-title Arquitectura de agentes - Agent_ApiKiwi
+title Arquitectura de agentes - Agent
 
-frame "Agent_ApiKiwi" {
+frame "Agent" {
   component FastAPIApp
   component HandoffEndpoint
 
@@ -27,7 +27,7 @@ frame "Agent_ApiKiwi" {
   }
 }
 
-database "MongoDB kiwi-mvc" as MongoDB
+database "MongoDB app" as MongoDB
 file "kiwi_drafts.json" as DraftJson
 cloud "OpenAI/LiteLLM" as LLM
 cloud "Kiwi TCMS XML-RPC" as Kiwi

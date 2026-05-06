@@ -4,7 +4,7 @@ skinparam shadowing false
 
 title Login y publicación en Kiwi TCMS
 
-frame "kiwi-mvc" {
+frame "app" {
   component DraftsView
   component DraftController
   component ManualKiwiService

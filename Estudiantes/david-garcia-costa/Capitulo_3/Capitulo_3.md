@@ -690,7 +690,7 @@ Después, el orquestador usa `get_kiwimvc_session_docs()` para leer únicamente 
 
 La publicación en Kiwi TCMS puede realizarse desde el flujo manual de `app` o desde el flujo automático de `agent`. En ambos casos se utiliza la API XML-RPC de Kiwi TCMS, evitando el acceso directo a MariaDB.
 
-Primero se ejecuta:
+Hay que loguearse con: 
 
 `Auth.login(username, password)`
 

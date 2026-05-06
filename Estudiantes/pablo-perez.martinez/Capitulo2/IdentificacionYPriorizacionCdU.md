@@ -18,9 +18,12 @@ reales de indicadores y valores teóricos.
 |CU-02: Listar partición| RF01, RF02, RF03, RF04, RF05, RF06, RF07 y RF08 | Responsable de producción | Alta |
 
 ## Diagrama de casos de uso - Responsable de producción
-![Diagrama de casos de uso - Responsable de producción](./imagenes/diagramaCdUResponsableProduccion.svg)
-
+| Diagrama | Código Fuente |
+|----------|---------------|
+|![Diagrama de casos de uso - Responsable de producción](./imagenes/diagramaCdUResponsableProduccion.svg)|[Ver Código](./modeloDelDominioImagenes/diagramaCdUResponsableProduccion.puml)
 
 ## Diagrama de contexto - Responsable de producción
-![Diagrama de contexto - Responsable de producción](./imagenes/diagramaContextoResponsableProduccion.svg)
+| Diagrama | Código Fuente |
+|----------|---------------|
+|![Diagrama de contexto - Responsable de producción](./imagenes/diagramaContextoResponsableProduccion.svg)|[Ver Código](./modeloDelDominioImagenes/diagramaContextoResponsableProduccion.puml)
 

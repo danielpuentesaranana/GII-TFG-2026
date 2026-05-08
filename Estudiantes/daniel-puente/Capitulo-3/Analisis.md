@@ -151,6 +151,50 @@ Permite liberar una mesa ocupada una vez que el ticket asociado ha sido cobrado 
 
 ## Analisis de Clases
 
+![Diagrama de Diseño1](/Estudiantes/daniel-puente/Capitulo-3/imagenes/diagramaDiseño1.png)
+
+![Diagrama de Diseño2](/Estudiantes/daniel-puente/Capitulo-3/imagenes/diagramaDiseño2.png)
+
+![Diagrama de Diseño3](/Estudiantes/daniel-puente/Capitulo-3/imagenes/diagramaDiseño3.png)
+
+
+El diagrama de clases de diseño muestra la organización interna del backend en controladores, servicios y modelos, siguiendo una separación clara de responsabilidades. Los controladores gestionan las peticiones HTTP y delegan la lógica de negocio en los servicios, que son el núcleo funcional del sistema y coordinan tanto el acceso a los modelos como la comunicación en tiempo real y el registro de auditoría.
+
+### Capa de Controladores
+
+Los controladores actúan como puerta de entrada de la API REST. Reciben la petición, validan la autenticación mediante JWT, extraen los parámetros necesarios y delegan la operación al servicio correspondiente.
+
+| Controlador        | Métodos principales                                                   |
+|--------------------|-----------------------------------------------------------------------|
+| `AuthController`   | `login()`, `refreshToken()`, `logout()`                               |
+| `MesaController`   | `getMesas()`, `abrirMesa()`, `cerrarMesa()`                           |
+| `ComandaController`| `crearComanda()`, `añadirLinea()`, `editarLinea()`, `getActivaPorMesa()` |
+| `KDSController`    | `getPendientes()`, `marcarComoListo()`                                |
+| `TicketController` | `generarTicket()`, `confirmarCobro()`                                 |
+| `ReservaController`| `getReservas()`, `crearReserva()`, `editarReserva()`, `cancelarReserva()` |
+| `UsuarioController`| `getUsuarios()`, `crearUsuario()`, `editarUsuario()`, `bloquearUsuario()` |
+| `CartaController`  | `getPlatos()`, `crearPlato()`, `editarPlato()`, `getTarifaActual()`   |
+
+### Capa de Servicios
+
+Los servicios implementan las reglas de negocio del restaurante y concentran las validaciones, cambios de estado, cálculos y sincronización del sistema. También integran la emisión de eventos en tiempo real y el registro de acciones relevantes.
+
+| Servicio              | Responsabilidad principal                                            |
+|-----------------------|-----------------------------------------------------------------------|
+| `AuthService`         | Autenticación, gestión de tokens y control de bloqueo.               |
+| `MesaService`         | Gestión del estado y disponibilidad de mesas.                        |
+| `ComandaService`      | Procesamiento de pedidos, validación de alérgenos y cálculo de totales. |
+| `TicketService`       | Generación del ticket y confirmación del cobro.                      |
+| `ReservaService`      | Creación, edición y cancelación de reservas.                         |
+| `UsuarioService`      | Gestión de usuarios y roles.                                         |
+| `CartaService`        | Administración de platos y tarifas del menú.                         |
+| `SocketService`       | Comunicación en tiempo real entre clientes conectados.               |
+| `OfflineSyncService`  | Sincronización de operaciones pendientes tras desconexiones.         |
+| `AuditoriaService`    | Trazabilidad de acciones realizadas en el sistema.                   |
+
+### Relación entre capas
+
+La arquitectura sigue un flujo unidireccional: los controladores delegan en los servicios y los servicios operan sobre los modelos de Mongoose. Esta estructura reduce el acoplamiento, mejora la mantenibilidad y facilita que cada capa pueda evolucionar de forma independiente.
 
 
 ## Analisis de Paquetes

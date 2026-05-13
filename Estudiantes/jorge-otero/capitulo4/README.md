@@ -47,9 +47,11 @@ El agente está desarrollado en **Power Apps**, herramienta de Microsoft, y se c
 }
 ```
 
-A continuación, se almacena el primer dato en el dataset de **Power BI**. La conexión se realiza mediante el conector de Power BI, que accede al dataset semántico. Inicialmente, se guarda en la tabla `TotalEmail` un identificador único, junto con la intención detectada y la fecha actual.
+A continuación, se almacena la información inicial del correo recibido en el dataset semántico `GestionVariaciones` de **Power BI**. La conexión se realiza mediante el conector oficial de Power BI, que permite insertar información directamente sobre dicho dataset.
 
-Después, se analiza la intención obtenida, lo que puede dar lugar a dos situaciones.
+Inicialmente, se crea un nuevo registro en la tabla `CorreoRecibido`, almacenando un identificador único autogenerado, junto con la intención detectada y la fecha actual de recepción del correo.
+
+Después, se analiza la intención obtenida, lo que puede dar lugar a diferentes situaciones y consultas posteriores dentro del flujo.
 
 # 1. Intenciones que no requieren consulta en base de datos
 
@@ -247,13 +249,17 @@ SELECTCOLUMNS(
 
 # Registro de información procesada
 
-Tras finalizar la consulta y antes de comprobar el siguiente número, el sistema almacena en la tabla `Numero`:
+Tras finalizar la consulta y antes de comprobar el siguiente número, el sistema almacena la información procesada en la tabla `Numero` del dataset semántico `GestionVariaciones` de **Power BI**.
+
+En dicha tabla se registra:
 
 - El número consultado.
 - La empresa colaboradora traducida.
 - La provincia.
 - El técnico responsable.
 - El número de veces que se ha consultado dicho identificador.
+
+Este almacenamiento permite mantener trazabilidad sobre todas las consultas realizadas y facilita posteriormente la explotación analítica de los datos desde Power BI.
 
 # Caso sin resultados
 
@@ -373,16 +379,160 @@ En este caso, el sistema realiza automáticamente las siguientes acciones:
 
 2. Actualización de las variables internas necesarias para identificar el estado del proceso y facilitar posteriormente el trabajo del técnico responsable.
 
-Una vez finalizadas las validaciones y ejecutadas las acciones correspondientes, el flujo procede a almacenar toda la información procesada en la base de datos de **Power BI**.
+# Registro de información de formularios
 
-La conexión entre **Power Automate** y **Power BI** se realiza mediante el conector oficial de Power BI, que permite insertar información directamente sobre un dataset semántico previamente configurado.
+Una vez finalizadas las validaciones y ejecutadas las acciones correspondientes, el flujo procede a almacenar toda la información procesada en el dataset semántico `GestionVariaciones` de **Power BI**.
 
-El almacenamiento de la información se realiza mediante la acción:
+La conexión entre **Power Automate** y **Power BI** se realiza mediante el conector oficial de Power BI, que permite insertar información directamente sobre dicho dataset.
+
+El almacenamiento de la información se realiza sobre la tabla `Formulario` mediante la acción:
 
 - `Add a row into a table`
 
-Esta acción inserta automáticamente un nuevo registro en la tabla `Formulario` del dataset de Power BI.
+Esta acción inserta automáticamente un nuevo registro en la tabla `Formulario` del dataset `GestionVariaciones`.
 
 La tabla está configurada con un identificador autogenerado, funcionando de manera similar a una base de datos SQL con campos autoincrementales. Por ello, no es necesario obtener manualmente el último identificador almacenado, ya que Power BI genera automáticamente un ID único para cada nuevo registro insertado.
 
-Los datos almacenados corresponden a toda la información obtenida y procesada desde Microsoft Forms. Únicamente se insertan aquellos campos que han sido rellenados por el usuario durante el formulario. Los campos no informados se almacenan con valor `null`, permitiendo mantener una estructura homogénea dentro de la tabla `Formulario` del dataset de Power BI.
+Los datos almacenados corresponden a toda la información obtenida y procesada desde Microsoft Forms. Únicamente se insertan aquellos campos que han sido rellenados por el usuario durante el formulario. Los campos no informados se almacenan con valor `null`, permitiendo mantener una estructura homogénea dentro de la tabla `Formulario`.
+
+Gracias a este registro automático, el sistema mantiene la trazabilidad completa de todas las solicitudes recibidas desde Microsoft Forms, permitiendo posteriormente realizar consultas, auditorías, generación de informes y análisis estadísticos directamente desde Power BI.
+
+# Caso de uso - Ver solicitudes
+
+El actor principal de este caso de uso es el **técnico**, que utiliza una vista desarrollada en **Power BI** para consultar las solicitudes recibidas y gestionar aquellas que se encuentran pendientes de revisión o resolución.
+
+La información mostrada en esta vista procede del dataset semántico `GestionVariaciones`, el cual centraliza los datos almacenados desde los distintos flujos de Power Automate.
+
+La finalidad principal de esta pantalla es permitir al técnico:
+
+- Consultar solicitudes asociadas a expedientes concretos.
+- Visualizar el estado de cada reclamación o formulario.
+- Filtrar información por intención o técnico responsable.
+- Identificar solicitudes pendientes.
+- Analizar métricas relacionadas con consultas y reclamaciones.
+
+## Vista general
+
+La vista se compone de distintos paneles de información y tablas dinámicas que permiten navegar y filtrar los datos almacenados.
+
+![Vista Solicitudes](./DescripcionSol/VistaSolicitudes.png)
+
+# Indicadores principales
+
+En la parte superior de la pantalla se muestran distintos indicadores generales calculados automáticamente desde Power BI.
+
+## Total Correos
+
+Muestra el número total de correos procesados y almacenados en el sistema.
+
+## Total de Formularios Pendientes
+
+Indica el número de formularios cuyo estado continúa pendiente de revisión o resolución.
+
+# Filtros disponibles
+
+La vista incorpora distintos filtros dinámicos que permiten segmentar la información mostrada.
+
+## Filtro por intención
+
+Permite visualizar únicamente los registros asociados a una intención concreta detectada por el sistema.
+
+Entre las intenciones disponibles se encuentran:
+
+- `consulta`
+- `peligro`
+- `separata`
+
+Al seleccionar una intención, todas las tablas e indicadores de la vista se actualizan automáticamente mostrando únicamente los datos relacionados.
+
+## Filtro de técnicos
+
+Permite filtrar la información según el técnico responsable asignado al expediente o solicitud.
+
+Esto facilita que cada técnico pueda consultar únicamente los casos asociados a su gestión.
+
+## Filtro por número
+
+Incluye un buscador que permite localizar directamente un expediente, actuación o incidencia concreta mediante su identificador.
+
+## Filtro por estado
+
+Permite filtrar los formularios según su estado actual:
+
+- `pendiente`
+- `resuelto`
+
+![Vista Solicitudes Filtro](./DescripcionSol/VistaSolicitudesFiltro.png)
+
+# Tabla principal de números
+
+La tabla central muestra la información consolidada de cada número procesado por el sistema.
+
+Entre los datos visualizados se encuentran:
+
+- Número de expediente o incidencia.
+- Tipo de expediente.
+- Empresa colaboradora.
+- Provincia.
+- Técnico responsable.
+- Número total de consultas recibidas.
+
+Además, esta tabla incorpora distintos campos calculados automáticamente mediante medidas DAX.
+
+# Datos calculados
+
+La vista contiene cuatro métricas calculadas dinámicamente a partir de los registros almacenados en la tabla `Formulario`:
+
+- Formularios pendientes.
+- Formularios resueltos.
+- Reclamaciones por tiempo.
+- Reclamaciones por falta de previsión.
+
+Estas métricas se calculan utilizando relaciones entre tablas y expresiones DAX.
+
+## Ejemplo de cálculo
+
+Para calcular el número de formularios pendientes asociados a un número concreto, se utiliza una medida DAX similar a la siguiente:
+
+```DAX
+Pendientes_por_numero =
+COUNTROWS(
+    FILTER(
+        RELATEDTABLE(Formulario),
+        Formulario[estado] = "pendiente"
+    )
+)
+```
+
+Esta medida funciona de la siguiente manera:
+
+1. `RELATEDTABLE(Formulario)` obtiene todos los formularios relacionados con el número seleccionado.
+
+2. `FILTER(...)` filtra únicamente aquellos formularios cuyo estado es `pendiente`.
+
+3. `COUNTROWS(...)` cuenta el número total de registros resultantes.
+
+El valor calculado se muestra automáticamente en la tabla principal de Power BI para cada expediente.
+
+De forma similar, se calculan las métricas de:
+
+- Formularios resueltos.
+- Reclamaciones por tiempo.
+- Reclamaciones por falta de previsión.
+
+# Tabla de detalle de formularios
+
+En la parte inferior de la vista se muestra una segunda tabla con el detalle de los formularios asociados al número seleccionado.
+
+Entre los datos visualizados se encuentran:
+
+- Identificador del formulario.
+- Número asociado.
+- Estado.
+- Tipo de solicitud.
+- Tipo de peticionario.
+- Motivos de reclamación.
+- Información adicional.
+- Explicación aportada por el cliente.
+
+Esta tabla permite al técnico consultar rápidamente toda la información introducida por el usuario desde Microsoft Forms y proceder a su gestión o resolución.

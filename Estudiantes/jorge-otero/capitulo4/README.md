@@ -40,7 +40,13 @@ Corresponde a cualquier asunto diferente de los anteriores.
 
 Cuando el asunto no coincide con ninguno de los casos anteriores, el correo es analizado por un agente configurado mediante un prompt. Este agente devuelve un JSON con la intención del mensaje y todos los números de más de cuatro cifras mencionados en el correo.
 
-El agente está desarrollado en **Power Apps**, herramienta de Microsoft, y se conecta al flujo mediante **Microsoft Dataverse**.
+Modelo IA usado:
+
+![ModeloIA](./DescripcionSol/ModeloIA.png)
+
+El gasto arpoximado por correo analizado es variable en función del correo y cuando haya que analizar pero se aproxima a 0,011€ por correo analizado.
+
+El agente está desarrollado en **Power Apps**, herramienta de Microsoft, y se conecta al flujo mediante **Microsoft Dataverse**. 
 
 ### Ejemplo de JSON devuelto
 

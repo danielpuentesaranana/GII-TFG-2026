@@ -1,5 +1,22 @@
 # Capitulo 4
 
+## Descripcion de funcionamiento del sistema
+
+El MVP implementado funciona como una PWA conectada a un backend Express y a una base de datos MongoDB. Las vistas no trabajan de forma independiente: comparten el estado de mesas, comandas, lineas, tickets y usuarios. Por ello, una accion realizada en sala puede reflejarse despues en cocina, caja o auditoria.
+
+| Paso | Vista principal | Funcionamiento implementado |
+|---|---|---|
+| 1 | `LoginView` | El usuario inicia sesion y la aplicacion carga el menu segun su rol. |
+| 2 | `SalaView` | Se muestran las mesas por zona junto con su estado operativo: libre, ocupada, cocina trabajando, ticket en caja o pendiente de cierre. |
+| 3 | `ComandaView` | El camarero abre la mesa y registra platos de carta o menu con cantidad, observaciones y alergenos. |
+| 4 | `ComandaView` / `Backend` | Si la comanda es de menu, primeros, segundos y postres se gestionan por pases para no saturar cocina. |
+| 5 | `KdsView` | Cocina cambia el estado de las lineas: `PENDIENTE`, `EN_PREPARACION`, `LISTO` y `SERVIDO`. |
+| 6 | `ComandaView` | El camarero puede enviar el ticket a caja cuando la comanda esta preparada para cobro. |
+| 7 | `CajaView` | El administrador cobra el ticket y, una vez cobrado, cierra la mesa para liberarla. |
+| 8 | `SyncView` | Si hay un corte de red, las operaciones se guardan en IndexedDB y se sincronizan al recuperar conexion. |
+
+De esta forma, el sistema cubre el flujo completo del servicio: mesa, comanda, cocina, caja y cierre, manteniendo trazabilidad y continuidad operativa.
+
 ## Mapa Navegacion
 ![Navegacion](/Estudiantes/daniel-puente/Capitulo-4/imagenes/MapaNav.svg)
 

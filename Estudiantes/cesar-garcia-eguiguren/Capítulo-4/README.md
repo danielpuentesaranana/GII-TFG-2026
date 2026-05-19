@@ -23,10 +23,11 @@ El diagrama refleja la navegación completa del sistema dividida en paquetes fun
 | **P3 · Departamentos** | `ListDept`, `DetDept` | Listado y ficha con distribución de carga del equipo. |
 | **P4 · Proyectos** | `ListProy`, `DetProy` | Listado y ficha con eficiencia, riesgo y rentabilidad del proyecto. |
 | **P5 · Tareas** | `ListTarea`, `DetTarea` | Listado polimórfico y detalle con subtareas y horas. |
-| **P6 · Métricas** | `Metricas` + 11 estados | Catálogo de métricas y cada métrica individual con guardar snapshot. |
+| **P6 · Análisis** | `MostrarCatálogoMetricas`, `MostrarGraficos`, `MostrarAsistencia`, `MostrarManager`| Métricas operativas, gráficos analíticos, asistencia vs imputaciones, distribución de equipo.|
 | **P7 · Rentabilidad ★** | `Rentabilidad`, `Lineas` | Exclusivo Director. Resumen financiero y líneas analíticas. |
-| **P8 · Utilidades** | `Graficos`, `Asistencia`, `Manager`, `Busqueda` | Gráficos analíticos, asistencia vs imputaciones, distribución de equipo y búsqueda global. |
+| **P8 · Utilidades** |`Busqueda` | Búsqueda global. |
 | **P9 · Snapshots** | `VisorInicial`, `Visor`, `DetSnap` | Visor independiente (puerto 3001) para consultar y eliminar snapshots. |
+| **P10 · Métricas Operativas** | `MetricasOperativas` | Métricas operativas del sistema. |
 
 ---
 

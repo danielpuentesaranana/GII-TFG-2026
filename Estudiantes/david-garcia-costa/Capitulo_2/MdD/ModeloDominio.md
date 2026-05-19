@@ -9,7 +9,7 @@
 # Modelo de Dominio
 
 ## Descripción general
-En el contexto organizativo, el sistema parte de un **Proyecto**, que proporciona el marco al que debe quedar asociada toda **Documentación**. La documentación constituye el punto de entrada del sistema y puede presentarse en forma de texto libre, DRF, DDS o combinación de varias fuentes documentales.
+En el contexto organizativo, el sistema parte de un **Proyecto**, que proporciona el marco al que debe quedar asociada toda **Documentación**. La documentación constituye el punto de entrada del sistema y puede presentarse en forma de DRF o DDS.
 
 A partir de la documentación se obtienen **Casos de Uso** y **Requisitos Funcionales**, que representan la base funcional del conocimiento extraído. Entre ambos se mantiene una relación de trazabilidad, ya que describen de forma complementaria el comportamiento esperado del sistema.
 

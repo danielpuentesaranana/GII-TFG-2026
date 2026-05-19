@@ -96,8 +96,6 @@ La organización por rutas permite desacoplar la navegación del frontend de la 
 | `GET` | `/api/auth/me` | `AuthController` | Recuperar el usuario autenticado. |
 | `GET` | `/api/documentation/projects` | `DocumentationController` | Listar proyectos con documentación registrada. |
 | `GET` | `/api/documentation/session/:id` | `DocumentationController` | Recuperar o extraer documentación asociada a una sesión. |
-| `GET` | `/api/documentation/:documentationId/extract-requirements` | `RequirementController` | Extraer requisitos funcionales desde un documento. |
-| `GET` | `/api/documentation/:documentationId/extract-use-cases` | `UseCaseController` | Extraer casos de uso desde un documento. |
 | `GET` | `/api/documentation` | `DocumentationController` | Listar documentos funcionales. |
 | `POST` | `/api/documentation` | `DocumentationController` | Crear un documento funcional. |
 | `GET` | `/api/documentation/:id` | `DocumentationController` | Consultar un documento funcional concreto. |
@@ -136,13 +134,13 @@ La organización por rutas permite desacoplar la navegación del frontend de la 
 | `POST` | `/api/kiwi-mvc/handoff` | `agent` | Preparar o lanzar el handoff desde el subsistema automático. |
 | `GET` | `/healthz` | `agent` | Comprobar el estado básico del servicio automático. |
 
-Estas rutas muestran cómo la capa Controlador no se limita a exponer operaciones CRUD simples, sino que implementa flujos de negocio completos como la extracción automática desde documentación, el ensamblado de borradores, la publicación en un sistema externo o el traspaso de una sesión al subsistema automático.
+Estas rutas muestran cómo la capa Controlador no se limita a exponer operaciones CRUD simples, sino que implementa flujos de negocio completos como el ensamblado de borradores, la publicación en un sistema externo o el traspaso de una sesión al subsistema automático.
 
 ## 4. Casos de uso 
 
-### CU-01 Introducir documentación funcional
+### CU-03 Introducir documentación funcional
 
-![CU-01](./CasosUso/IntroducirDocumentacion/IntroducirDocumentacion.svg)
+![CU-03](./CasosUso/IntroducirDocumentacion/IntroducirDocumentacion.svg)
 
 | Elemento | Valor |
 | --- | --- |
@@ -155,9 +153,9 @@ Estas rutas muestran cómo la capa Controlador no se limita a exponer operacione
 
 Este caso de uso se satisface específicamente con la ruta `POST /api/documentation`. La vista envía la documentación funcional, y el controlador crea un documento en MongoDB asociado a una sesión de trabajo mediante `sessionId`.
 
-### CU-02 Crear caso de uso
+### CU-12 Crear caso de uso
 
-![CU-02](./CasosUso/CrearCasoUso/CrearCasoUso.svg)
+![CU-12](./CasosUso/CrearCasoUso/CrearCasoUso.svg)
 
 | Elemento | Valor |
 | --- | --- |
@@ -170,9 +168,9 @@ Este caso de uso se satisface específicamente con la ruta `POST /api/documentat
 
 Este caso de uso se satisface con `POST /api/use-cases`. El sistema crea un caso de uso asociado a una sesión y, si procede, a la documentación funcional de origen mediante `documentationId`.
 
-### CU-03 Crear requisito funcional
+### CU-17 Crear requisito funcional
 
-![CU-03](./CasosUso/CrearRF/CrearRF.svg)
+![CU-17](./CasosUso/CrearRF/CrearRF.svg)
 
 | Elemento | Valor |
 | --- | --- |
@@ -185,9 +183,9 @@ Este caso de uso se satisface con `POST /api/use-cases`. El sistema crea un caso
 
 Este caso se satisface con `POST /api/requirements`. El requisito funcional queda guardado en MongoDB y puede mantener trazabilidad con el documento original mediante `documentationId` y con un caso de uso mediante `ucId`.
 
-### CU-04 Crear escenario Gherkin
+### CU-21 Crear escenario Gherkin
 
-![CU-04](./CasosUso/CrearEscenariosGherkin/CrearEscenariosGherkin.svg)
+![CU-21](./CasosUso/CrearEscenariosGherkin/CrearEscenariosGherkin.svg)
 
 | Elemento | Valor |
 | --- | --- |
@@ -200,9 +198,9 @@ Este caso se satisface con `POST /api/requirements`. El requisito funcional qued
 
 Este caso se satisface con `POST /api/scenarios`. El escenario queda almacenado en MongoDB con su estructura Gherkin y mantiene trazabilidad con casos de uso y requisitos funcionales mediante `ucId` y `rfIds`.
 
-### CU-05 Crear borrador
+### CU-25 Crear borrador
 
-![CU-05](./CasosUso/CrearBorrador/CrearBorrador.svg)
+![CU-25](./CasosUso/CrearBorrador/CrearBorrador.svg)
 
 | Elemento | Valor |
 | --- | --- |
@@ -216,9 +214,9 @@ Este caso se satisface con `POST /api/scenarios`. El escenario queda almacenado 
 
 Este caso se satisface con `POST /api/drafts/assemble`. El controlador ensambla un borrador a partir de los casos de uso, requisitos funcionales y escenarios Gherkin existentes en la sesión.
 
-### CU-06 Aceptar y publicar caso de prueba a partir de borrador
+### CU-30 Aceptar y publicar caso de prueba a partir de borrador
 
-![CU-06](./CasosUso/AceptarYPublicarCasoPruebaBorrador/AceptarYPublicarCasoPruebaBorrador.svg)
+![CU-30](./CasosUso/AceptarYPublicarCasoPruebaBorrador/AceptarYPublicarCasoPruebaBorrador.svg)
 
 | Elemento | Valor |
 | --- | --- |
@@ -690,7 +688,7 @@ Después, el orquestador usa `get_kiwimvc_session_docs()` para leer únicamente 
 
 La publicación en Kiwi TCMS puede realizarse desde el flujo manual de `app` o desde el flujo automático de `agent`. En ambos casos se utiliza la API XML-RPC de Kiwi TCMS, evitando el acceso directo a MariaDB.
 
-Hay que loguearse con: 
+La autenticación se realiza mediante: 
 
 `Auth.login(username, password)`
 

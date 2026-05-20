@@ -52,7 +52,7 @@ Modelo IA usado:
 
 ![ModeloIA](./DescripcionSol/ModeloIA.png)
 
-El gasto arpoximado por correo analizado es variable en función del correo y cuando haya que analizar pero se aproxima a 0,011€ por correo analizado.
+El gasto aproximado por correo analizado es variable en función del correo y cuando haya que analizar pero se aproxima a 0,011€ por correo analizado.
 
 El agente está desarrollado en **Power Apps**, herramienta de Microsoft, y se conecta al flujo mediante **Microsoft Dataverse**. 
 

@@ -10,9 +10,9 @@ El subsistema `app` utiliza modelos Mongoose para definir los esquemas de colecc
 
 Cada clase del diagrama representa una colección funcional del sistema:
 
-- `User`: usuarios autenticados.
+- `User`: actor autenticados.
 - `Session`: sesiones de trabajo.
-- `Documentation`: documentación funcional introducida por el usuario.
+- `Documentation`: documentación funcional introducida por el actor.
 - `UseCase`: casos de uso.
 - `FunctionalRequirement`: requisitos funcionales.
 - `GherkinScenario`: escenarios Gherkin.
@@ -72,7 +72,7 @@ La presencia de esta capa intermedia mejora la mantenibilidad del sistema porque
 
 ### Justificación de decisiones de diseño
 
-Se mantiene una arquitectura MVC porque encaja con la separación natural del subsistema `app`: la vista concentra la interacción del usuario, los controladores exponen los casos de uso mediante API REST y los modelos representan las entidades persistentes del dominio. Esta decisión facilita localizar responsabilidades y evita mezclar interfaz, reglas de negocio y persistencia en un mismo punto.
+Se mantiene una arquitectura MVC porque encaja con la separación natural del subsistema `app`: la vista concentra la interacción del actor, los controladores exponen los casos de uso mediante API REST y los modelos representan las entidades persistentes del dominio. Esta decisión facilita localizar responsabilidades y evita mezclar interfaz, reglas de negocio y persistencia en un mismo punto.
 
 La capa de servicios se incorpora como apoyo al patrón MVC para encapsular operaciones que no pertenecen estrictamente a un único controlador, como la generación de identificadores, la trazabilidad entre artefactos, el ensamblado de borradores o la publicación en Kiwi TCMS. De esta forma, los controladores quedan orientados a recibir peticiones, validar datos y coordinar el flujo, mientras que la lógica reutilizable queda en módulos específicos.
 
@@ -92,8 +92,8 @@ La organización por rutas permite desacoplar la navegación del frontend de la 
 | --- | --- | --- | --- |
 | `POST` | `/api/auth/login` | `AuthController` | Iniciar sesión en la aplicación. |
 | `POST` | `/api/auth/logout` | `AuthController` | Cerrar la sesión activa. |
-| `POST` | `/api/auth/register` | `AuthController` | Registrar un nuevo usuario. |
-| `GET` | `/api/auth/me` | `AuthController` | Recuperar el usuario autenticado. |
+| `POST` | `/api/auth/register` | `AuthController` | Registrar un nuevo actor. |
+| `GET` | `/api/auth/me` | `AuthController` | Recuperar el actor autenticado. |
 | `GET` | `/api/documentation/projects` | `DocumentationController` | Listar proyectos con documentación registrada. |
 | `GET` | `/api/documentation/session/:id` | `DocumentationController` | Recuperar o extraer documentación asociada a una sesión. |
 | `GET` | `/api/documentation` | `DocumentationController` | Listar documentos funcionales. |
@@ -152,6 +152,22 @@ Estas rutas muestran cómo la capa Controlador no se limita a exponer operacione
 #### Explicación
 
 Este caso de uso se satisface específicamente con la ruta `POST /api/documentation`. La vista envía la documentación funcional, y el controlador crea un documento en MongoDB asociado a una sesión de trabajo mediante `sessionId`.
+
+### CU-39 Crear traspaso al flujo automático
+
+![CU-39](./CasosUso/CrearTraspasoFlujoAutomatico/CrearTraspasoFlujoAutomatico.svg)
+
+| Elemento | Valor |
+| --- | --- |
+| Ruta que satisface el caso | `POST /api/sessions/:id/handoff-to-agent` |
+| Controlador | `SessionController.handoffToAgent` |
+| Modelo principal | `Session` |
+| Modelo auxiliar | `Documentation` |
+| Sistema externo | `agent` |
+
+#### Explicación
+
+Este caso se satisface con `POST /api/sessions/:id/handoff-to-agent`. El controlador recupera la sesión del usuario, valida que tenga proyecto y documentación asociada, invoca el handoff del subsistema automático mediante `POST /api/kiwi-mvc/handoff` y guarda en la sesión los datos devueltos, incluyendo `agentSessionId`, `agentUserId`, `agentAppName`, `agentHandoffUrl` y el cambio de `workflowMode` a `automatico`.
 
 ### CU-12 Crear caso de uso
 
@@ -278,7 +294,7 @@ Este caso de uso se satisface con `POST /api/drafts/:id/publish`. El controlador
 
 ### Ciclo de vida de una sesión
 
-La entidad `Session` actúa como contenedor lógico del proceso de trabajo. Una sesión agrupa la documentación funcional introducida por el usuario y todos los artefactos derivados de ella.
+La entidad `Session` actúa como contenedor lógico del proceso de trabajo. Una sesión agrupa la documentación funcional introducida por el actor y todos los artefactos derivados de ella.
 
 El ciclo de vida de una sesión es:
 
@@ -767,6 +783,5 @@ La estructura de paquetes de `app` sigue el patrón MVC:
 ---
 
 [← Volver al Índice](../README.md)
-
 
 

@@ -110,7 +110,7 @@ Para que esa descripción sea más clara, natural y fácil de seguir, suele util
 
 Su interés en este trabajo es especialmente alto porque puede actuar como punto de destino de los escenarios generados por el sistema multiagente. Además, el hecho de contar con API facilita su integración con arquitecturas basadas en herramientas y automatización, lo que la convierte en un elemento especialmente adecuado para la propuesta concreta de este TFG.  
 
-Digamos para detallar mas, uno de los agentes se encarga de conectarse con la API de Kiwi TCMS para insertar automáticamente la información generada en la herramienta (A partir de los escenarios, este agente crea los casos de prueba dentro de la plataforma)
+Para detallar más este punto, uno de los agentes se encarga de conectarse con la API de Kiwi TCMS para insertar los casos de prueba con la información generada en la herramienta mediante un enfoque Human-In-The-Loop, es decir, con revisión humana (A partir de los borradores con todo el contenido previo, este agente crea los casos de prueba dentro de la plataforma)
 
 Así la solución no se limita a generar texto de forma aislada, sino que transforma ese output en elementos útiles dentro del proceso de QA. Esto permite mantener la información organizada para que el equipo de QA lo utilice.
 

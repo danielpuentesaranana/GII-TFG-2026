@@ -123,16 +123,14 @@ WebSocket soluciona esto creando una conexión permanente entre cliente y servid
 
 ###  Autenticación con JWT y control de acceso por rol
 
-El sistema tiene tres tipos de usuario con permisos distintos: Camarero, Cocinero y Administrador.
+El sistema tiene tres tipos de usuario con permisos distintos: Camarero, Cocinero y Administrador. Cada rol determina las vistas y operaciones disponibles dentro de la aplicación.
 
-Un JWT es un token firmado que contiene la identidad y el rol del usuario. El servidor lo genera al hacer login y el cliente lo incluye en cada petición a la API. Así el servidor sabe quién es el usuario y que puede realizar sin tener que consultar la base de datos.
+La autenticación se realiza mediante JWT. Un JWT es un token firmado que contiene la identidad del usuario y su rol. El servidor lo genera cuando el usuario inicia sesión y el cliente lo incluye en las peticiones posteriores a la API. De esta forma, el backend puede comprobar quién realiza cada operación y si tiene permisos para ejecutarla.
 
-Se usan dos tipos de token:
+En el proyecto se utiliza un token de acceso con duración limitada durante la sesión de trabajo. Este token permite mantener autenticado al usuario durante el turno sin obligarle a iniciar sesión de forma repetida, pero evitando mantener sesiones indefinidas. Cuando la sesión expira, el usuario debe volver a autenticarse.
 
-- **Access token**: de corta duración (15-60 minutos), se incluye en cada petición. Cuando caduca, el cliente pide uno nuevo.
-- **Refresh token**: de larga duración, guardado en una cookie segura. Permite que el camarero no tenga que volver a hacer login durante todo el turno.
+El control de acceso se implementa en el backend mediante middleware de Express. Este middleware valida el token JWT y comprueba el rol del usuario antes de permitir el acceso a cada ruta protegida. Por ejemplo, un camarero puede abrir mesas y tomar comandas, el cocinero puede trabajar sobre el KDS, y el cobro de tickets queda restringido al rol Administrador. 
 
-El control de acceso se implementa en el servidor con un middleware de Express que comprueba el token y el rol antes de ejecutar cada operación. Por ejemplo, el endpoint de cobrar un ticket solo es accesible para el rol Administrador.
 
 ---------------------------------------
 
@@ -275,4 +273,3 @@ El proyecto adopta una metodología iterativa e incremental con un cliente real.
 
 ## Referencias bibliograficas
 
-Añadir

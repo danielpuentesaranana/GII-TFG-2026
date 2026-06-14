@@ -1,0 +1,44 @@
+@startuml
+title CU-17 - Cobrar ticket en caja
+
+hide footbox
+skinparam shadowing false
+skinparam backgroundColor white
+
+actor "Administrador" as Actor
+participant "CajaView" as Vista
+participant "TicketController" as Controller
+participant "TicketService" as Service
+participant "Modelos Mongoose\n(Ticket, Comanda,\nUsuario, LogAuditoria)" as Modelos
+database "MongoDB Atlas" as BD
+participant "SocketService" as Socket
+participant "CajaView / MesasView" as VistasSync
+
+Actor -> Vista : Accede a caja
+Vista -> Controller : GET /api/tickets
+Controller --> Vista : Tickets pendientes
+
+Actor -> Vista : Selecciona ticket y confirma cobro
+Vista -> Controller : PATCH /api/tickets/:id/cobrar
+Controller -> Service : cobrarTicket(ticketId, usuario_id)
+
+Service -> Modelos : Buscar ticket
+Modelos -> BD : find Ticket
+BD --> Modelos : Ticket PENDIENTE
+Modelos --> Service : Datos del ticket
+
+Service -> Service : Validar estado PENDIENTE
+Service -> Modelos : Actualizar Ticket(COBRADO,\ncobradoPor, cobradoEn)
+Modelos -> BD : update Ticket
+BD --> Modelos : Ticket cobrado
+
+Service -> Modelos : Registrar auditoría
+Modelos -> BD : insert LogAuditoria
+
+Service -> Socket : emitir ticket:cobrado
+Socket -> VistasSync : Actualizar caja y mesa\npendiente de cierre
+
+Service --> Controller : Ticket cobrado
+Controller --> Vista : Respuesta OK
+Vista --> Actor : Cobro confirmado
+@enduml

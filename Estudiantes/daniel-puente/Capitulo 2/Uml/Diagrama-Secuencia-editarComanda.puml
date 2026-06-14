@@ -1,0 +1,42 @@
+@startuml
+title CU-08 - Editar comanda
+
+hide footbox
+skinparam shadowing false
+skinparam backgroundColor white
+
+actor "Camarero / Administrador" as Actor
+participant "ComandaView" as Vista
+participant "ComandaController" as Controller
+participant "ComandaService" as Service
+participant "Modelos Mongoose\n(Comanda, LineaComanda,\nPlato, LogAuditoria)" as Modelos
+database "MongoDB Atlas" as BD
+participant "SocketService" as Socket
+participant "KDSView / ComandaView" as VistasSync
+
+Actor -> Vista : Edita cantidad, observación\no cancela línea pendiente
+Vista -> Controller : PUT/PATCH línea de comanda
+Controller -> Service : actualizarLineaComanda(lineaId, datos)
+
+Service -> Modelos : Buscar línea y comanda asociada
+Modelos -> BD : find LineaComanda / Comanda
+BD --> Modelos : Línea y comanda
+Modelos --> Service : Datos actuales
+
+Service -> Service : Validar comanda ABIERTA
+Service -> Service : Validar línea en estado PENDIENTE
+
+Service -> Modelos : Actualizar o cancelar línea
+Modelos -> BD : update LineaComanda
+BD --> Modelos : Línea actualizada
+
+Service -> Modelos : Registrar auditoría
+Modelos -> BD : insert LogAuditoria
+
+Service -> Socket : emitir lineaComanda:actualizada\n/ kds:actualizado
+Socket -> VistasSync : Refrescar comanda y KDS
+
+Service --> Controller : Línea actualizada
+Controller --> Vista : Respuesta OK
+Vista --> Actor : Comanda actualizada
+@enduml

@@ -1,0 +1,68 @@
+@startuml
+title CU-04 - Abrir mesa
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam ArrowColor #3F8F3F
+skinparam state {
+  BackgroundColor #F5F5F5
+  BorderColor #777777
+  FontColor #111111
+}
+skinparam note {
+  BackgroundColor #FFF8D6
+  BorderColor #C8B45D
+}
+
+state "abrirMesa()" as AbrirMesa {
+  [*] --> Solicitud
+
+  Solicitud : El camarero o administrador\nselecciona una mesa disponible
+  note right of Solicitud
+    Precondición:
+    Mesa LIBRE o RESERVADA
+    y sin comanda activa.
+  end note
+
+  Solicitud --> Validacion
+
+  Validacion : Sistema valida que la mesa exista,\nesté disponible y no tenga\ncomanda activa
+
+  Validacion --> CrearComanda
+
+  CrearComanda : Sistema crea una comanda\nen estado ABIERTA
+
+  CrearComanda --> AsociarMesa
+
+  AsociarMesa : Sistema asocia la comanda\na la mesa seleccionada
+
+  AsociarMesa --> ActualizarMesa
+
+  ActualizarMesa : Sistema actualiza la mesa\na estado OCUPADA
+
+  ActualizarMesa --> Registrar
+
+  Registrar : Sistema registra la apertura\nen auditoría y actualiza\nel plano en tiempo real
+
+  Registrar --> [*]
+}
+
+AbrirMesa --> COMANDA_ABIERTA : aperturaCorrecta()
+AbrirMesa --> OPERACION_RECHAZADA : aperturaRechazada()
+
+state "COMANDA_ABIERTA" as COMANDA_ABIERTA
+state "OPERACION_RECHAZADA" as OPERACION_RECHAZADA
+
+note right of COMANDA_ABIERTA
+  Postcondición:
+  Mesa ocupada y vinculada
+  a una comanda activa.
+end note
+
+note right of OPERACION_RECHAZADA
+  La operación se rechaza si la mesa
+  no existe, no está disponible
+  o ya tiene comanda activa.
+end note
+
+@enduml

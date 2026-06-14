@@ -1,0 +1,61 @@
+@startuml
+skinparam state {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    ArrowColor #333333
+}
+skinparam shadowing false
+
+title Diagrama de Contexto Global - Casos de Uso Seleccionados
+
+' ==========================================
+' DEFINICIÓN DE ESTADOS
+' ==========================================
+state "MESA DISPONIBLE" as MesaDisponible
+state "MESA OCUPADA\nCOMANDA ABIERTA" as MesaOcupadaComandaAbierta
+state "COMANDA REGISTRADA" as ComandaRegistrada
+state "PLATOS EN COCINA" as PlatosEnCocina
+state "PLATOS LISTOS\nPARA SERVIR" as PlatosListosParaServir
+state "TICKET EN CAJA" as TicketEnCaja
+state "TICKET COBRADO" as TicketCobrado
+state "COMANDA ACTUALIZADA" as ComandaActualizada
+state "SERVICIO CERRADO\nMESA LIBERADA" as ServicioCerradoMesaLiberada
+
+' ==========================================
+' TRANSICIONES Y FLUJOS (Trazado idéntico)
+' ==========================================
+
+[*] --> MesaDisponible
+
+MesaDisponible --> MesaOcupadaComandaAbierta : CU-04 Abrir mesa\nabrirComanda()
+
+MesaOcupadaComandaAbierta --> MesaDisponible : cancelar servicio\nsin consumo
+
+MesaOcupadaComandaAbierta --> ComandaRegistrada : CU-06 Tomar comanda\nagregarLineaComanda()
+
+ComandaRegistrada --> MesaDisponible : cancelar comanda\nincidencia
+
+ComandaRegistrada --> ComandaRegistrada : solicitarPaseMenu()\nsegundos / postres
+
+ComandaRegistrada --> PlatosEnCocina : enviar líneas a cocina\nkdsActualizado()
+
+PlatosEnCocina --> PlatosListosParaServir : CU-12 Marcar plato como listo\ncambiarEstadoLineaKds()
+
+PlatosListosParaServir --> PlatosEnCocina : nuevo pase solicitado\nactualizar KDS
+
+PlatosListosParaServir --> TicketEnCaja : CU-14 Enviar ticket a caja\ngenerarTicket()
+
+TicketEnCaja --> TicketCobrado : CU-17 Cobrar ticket\ncobrarTicket()
+
+TicketEnCaja --> ComandaActualizada : reclamarTicket()\nmodificar comanda antes de cobrar
+
+ComandaRegistrada --> ComandaActualizada : CU-08 Editar comanda\nactualizarLinea() / cancelarLinea()
+
+ComandaActualizada --> ComandaRegistrada : guardar cambios\ncomandaActualizada()
+
+TicketCobrado --> ServicioCerradoMesaLiberada : CU-05 Cerrar mesa\ncerrarMesa()
+
+ServicioCerradoMesaLiberada --> MesaDisponible : mesa libre\nnuevo servicio
+
+@endum
+@enduml

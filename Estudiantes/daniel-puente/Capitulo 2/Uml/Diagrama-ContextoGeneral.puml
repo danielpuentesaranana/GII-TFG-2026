@@ -1,0 +1,83 @@
+@startuml
+title Diagrama de Contexto Global - Casos de Uso del MVP
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam defaultFontName Arial
+
+top to bottom direction
+
+[*] --> SistemaNoAutenticado
+
+state "SISTEMA NO AUTENTICADO" as SistemaNoAutenticado
+state "USUARIO AUTENTICADO" as UsuarioAutenticado
+state "PLANO DE MESAS CONSULTADO" as PlanoMesas
+state "MESA OCUPADA\nCOMANDA ABIERTA" as MesaOcupada
+state "COMANDA REGISTRADA" as ComandaRegistrada
+state "COMANDA ACTUALIZADA" as ComandaActualizada
+state "PASE DE MENÚ SOLICITADO" as PaseMenu
+state "KDS CON LÍNEAS PENDIENTES" as KdsPendiente
+state "PLATO EN PREPARACIÓN" as PlatoPreparacion
+state "PLATO LISTO" as PlatoListo
+state "TICKET EN CAJA" as TicketCaja
+state "TICKET COBRADO" as TicketCobrado
+state "MESA LIBERADA\nSERVICIO CERRADO" as MesaLiberada
+
+state "RESERVAS CONSULTADAS" as ReservasConsultadas
+state "RESERVA CREADA O EDITADA" as ReservaGestionada
+state "RESERVA ASIGNADA A MESA" as ReservaAsignada
+
+state "CARTA ACTUALIZADA" as CartaActualizada
+state "USUARIOS Y ROLES ACTUALIZADOS" as UsuariosActualizados
+state "AUDITORÍA CONSULTADA" as AuditoriaConsultada
+
+state "OPERACIÓN OFFLINE GUARDADA" as OfflinePendiente
+state "OPERACIÓN SINCRONIZADA" as OfflineSincronizada
+state "NOTIFICACIÓN EMITIDA" as NotificacionEmitida
+
+SistemaNoAutenticado --> UsuarioAutenticado : CU-01 Iniciar sesión
+UsuarioAutenticado --> SistemaNoAutenticado : CU-02 Cerrar sesión
+
+UsuarioAutenticado --> PlanoMesas : CU-03 Ver estado de mesas por zona
+PlanoMesas --> MesaOcupada : CU-04 Abrir mesa
+MesaOcupada --> ComandaRegistrada : CU-06 Tomar comanda
+ComandaRegistrada --> ComandaActualizada : CU-08 Editar comanda
+ComandaActualizada --> ComandaRegistrada : guardar cambios
+
+ComandaRegistrada --> PaseMenu : CU-09 Solicitar segundos / postres
+PaseMenu --> KdsPendiente : actualizar KDS
+
+ComandaRegistrada --> KdsPendiente : CU-10 Ver comandas pendientes en KDS
+KdsPendiente --> PlatoPreparacion : CU-11 Marcar en preparación
+PlatoPreparacion --> PlatoListo : CU-12 Marcar plato como listo
+PlatoListo --> NotificacionEmitida : CU-27 Notificación automática
+ComandaRegistrada --> ComandaRegistrada : CU-13 Ver alérgenos y observaciones
+
+PlatoListo --> TicketCaja : CU-14 Enviar ticket a caja
+TicketCaja --> ComandaActualizada : reclamar ticket antes de cobrar
+TicketCaja --> TicketCobrado : CU-17 Cobrar ticket en caja
+TicketCobrado --> MesaLiberada : CU-05 Cerrar mesa
+MesaLiberada --> PlanoMesas : mesa disponible para nuevo servicio
+
+UsuarioAutenticado --> ReservasConsultadas : CU-18 Ver reservas del día
+ReservasConsultadas --> ReservaGestionada : CU-19 Gestionar reservas
+ReservaGestionada --> ReservaAsignada : CU-20 Asignar mesa a reserva
+ReservaAsignada --> PlanoMesas : actualizar ocupación prevista
+
+UsuarioAutenticado --> UsuariosActualizados : CU-21 Gestionar usuarios y roles
+UsuarioAutenticado --> CartaActualizada : CU-25 Gestionar carta
+UsuarioAutenticado --> AuditoriaConsultada : consultar trazabilidad
+
+ComandaRegistrada --> OfflinePendiente : guardar operación sin conexión
+TicketCaja --> OfflinePendiente : guardar operación sin conexión
+ReservaGestionada --> OfflinePendiente : guardar operación sin conexión
+OfflinePendiente --> OfflineSincronizada : recuperar conexión
+OfflineSincronizada --> PlanoMesas : refrescar estado del sistema
+
+ComandaRegistrada --> ComandaRegistrada : CU-N03 bloquear alérgenos incompletos
+ComandaActualizada --> ComandaActualizada : CU-N05 bloquear edición en preparación
+TicketCaja --> TicketCaja : CU-N06 rechazar ticket duplicado
+UsuarioAutenticado --> UsuarioAutenticado : CU-N02 bloquear operación por rol
+SistemaNoAutenticado --> SistemaNoAutenticado : CU-N01 credenciales incorrectas
+@enduml

@@ -1,0 +1,72 @@
+@startuml
+title CU-05 - Cerrar mesa
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam ArrowColor #3F8F3F
+skinparam state {
+  BackgroundColor #F5F5F5
+  BorderColor #777777
+  FontColor #111111
+}
+skinparam note {
+  BackgroundColor #FFF8D6
+  BorderColor #C8B45D
+}
+
+state "cerrarMesa()" as CerrarMesa {
+  [*] --> SeleccionarMesa
+
+  SeleccionarMesa : El administrador selecciona\nuna mesa pendiente de cierre
+  note right of SeleccionarMesa
+    Precondición:
+    La mesa está OCUPADA
+    y el ticket asociado
+    ha sido COBRADO.
+  end note
+
+  SeleccionarMesa --> VerificarComanda
+
+  VerificarComanda : Sistema verifica que existe\nuna comanda activa asociada\na la mesa
+
+  VerificarComanda --> ComprobarTicket
+
+  ComprobarTicket : Sistema comprueba que el ticket\ncorrespondiente está COBRADO
+
+  ComprobarTicket --> CerrarComanda
+
+  CerrarComanda : Sistema cierra la comanda\nasociada al servicio
+
+  CerrarComanda --> LiberarMesa
+
+  LiberarMesa : Sistema actualiza la mesa\na estado LIBRE
+
+  LiberarMesa --> RegistrarAuditoria
+
+  RegistrarAuditoria : Sistema registra el cierre\nde mesa en auditoría
+
+  RegistrarAuditoria --> ActualizarPlano
+
+  ActualizarPlano : Sistema actualiza el plano\nde mesas en tiempo real
+
+  ActualizarPlano --> [*]
+}
+
+CerrarMesa --> MESA_LIBRE : cierreCorrecto()
+CerrarMesa --> OPERACION_RECHAZADA : cierreNoValido()
+
+state "MESA_LIBRE" as MESA_LIBRE
+state "OPERACION_RECHAZADA" as OPERACION_RECHAZADA
+
+note right of MESA_LIBRE
+  Postcondición:
+  La comanda queda cerrada
+  y la mesa pasa a estado LIBRE.
+end note
+
+note right of OPERACION_RECHAZADA
+  La operación se rechaza si no existe
+  comanda activa asociada o si el ticket
+  todavía no está COBRADO.
+end note
+@enduml

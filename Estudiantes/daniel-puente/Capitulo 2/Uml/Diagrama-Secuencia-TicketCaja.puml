@@ -1,0 +1,44 @@
+@startuml
+title CU-14 - Enviar ticket a caja
+
+hide footbox
+skinparam shadowing false
+skinparam backgroundColor white
+
+actor "Camarero / Administrador" as Actor
+participant "ComandaView" as Vista
+participant "TicketController" as Controller
+participant "TicketService" as Service
+participant "Modelos Mongoose\n(Comanda, LineaComanda,\nTicket, LogAuditoria)" as Modelos
+database "MongoDB Atlas" as BD
+participant "SocketService" as Socket
+participant "CajaView" as Caja
+
+Actor -> Vista : Revisa comanda de la mesa
+Actor -> Vista : Pulsa enviar ticket a caja
+Vista -> Controller : POST /api/tickets\n(comanda_id)
+Controller -> Service : generarTicket(comanda_id, usuario_id)
+
+Service -> Modelos : Buscar comanda y líneas
+Modelos -> BD : find Comanda / LineaComanda
+BD --> Modelos : Datos de comanda
+
+Service -> Modelos : Comprobar ticket previo
+Modelos -> BD : find Ticket por comanda
+BD --> Modelos : No existe ticket duplicado
+
+Service -> Service : Calcular total de carta\ny tarifas de menú
+Service -> Modelos : Crear Ticket(PENDIENTE)
+Modelos -> BD : insert Ticket
+BD --> Modelos : Ticket generado
+
+Service -> Modelos : Registrar auditoría
+Modelos -> BD : insert LogAuditoria
+
+Service -> Socket : emitir ticket:generado
+Socket -> Caja : Mostrar ticket pendiente
+
+Service --> Controller : Ticket generado
+Controller --> Vista : Respuesta OK
+Vista --> Actor : Ticket enviado a caja
+@enduml

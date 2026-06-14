@@ -1,0 +1,42 @@
+@startuml
+title CU-04 - Abrir mesa
+
+hide footbox
+skinparam shadowing false
+skinparam backgroundColor white
+
+actor "Camarero / Administrador" as Actor
+participant "MesasView" as Vista
+participant "ComandaController" as Controller
+participant "ComandaService" as Service
+participant "Modelos Mongoose\n(Mesa, Comanda,\nLogAuditoria)" as Modelos
+database "MongoDB Atlas" as BD
+participant "SocketService" as Socket
+participant "MesasView\n(otros dispositivos)" as VistaSync
+
+Actor -> Vista : Selecciona mesa disponible
+Vista -> Controller : POST /api/comandas\n(mesa_id)
+Controller -> Service : abrirComanda(mesa_id, usuario_id)
+Service -> Modelos : Buscar mesa y comprobar disponibilidad
+Modelos -> BD : find Mesa / Comanda activa
+BD --> Modelos : Mesa disponible
+Modelos --> Service : Datos válidos
+
+Service -> Modelos : Crear Comanda(ABIERTA)
+Modelos -> BD : insert Comanda
+BD --> Modelos : Comanda creada
+
+Service -> Modelos : Actualizar Mesa(OCUPADA)
+Modelos -> BD : update Mesa
+BD --> Modelos : Mesa actualizada
+
+Service -> Modelos : Registrar auditoría
+Modelos -> BD : insert LogAuditoria
+
+Service -> Socket : emitir comanda:abierta / mesa:actualizada
+Socket -> VistaSync : Actualizar plano de mesas
+
+Service --> Controller : Comanda creada
+Controller --> Vista : Respuesta OK
+Vista --> Actor : Mesa ocupada y comanda activa
+@enduml

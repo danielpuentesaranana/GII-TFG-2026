@@ -1,0 +1,45 @@
+@startuml
+title CU-06 - Tomar comanda
+
+hide footbox
+skinparam shadowing false
+skinparam backgroundColor white
+
+actor "Camarero / Administrador" as Actor
+participant "ComandaView" as Vista
+participant "ComandaController" as Controller
+participant "ComandaService" as Service
+participant "Modelos Mongoose\n(Comanda, LineaComanda,\nPlato, TarifaMenu,\nLogAuditoria)" as Modelos
+database "MongoDB Atlas" as BD
+participant "SocketService" as Socket
+participant "KDSView" as KDS
+
+Actor -> Vista : Añade plato, cantidad,\nobservaciones y alérgenos
+Vista -> Controller : POST /api/comandas/:id/lineas
+Controller -> Service : agregarLineaComanda(datos)
+
+Service -> Modelos : Validar comanda ABIERTA
+Modelos -> BD : find Comanda
+BD --> Modelos : Comanda activa
+
+Service -> Modelos : Consultar plato y tarifa de menú
+Modelos -> BD : find Plato / TarifaMenu
+BD --> Modelos : Datos de carta
+
+Service -> Service : Validar disponibilidad,\nobservaciones y alérgenos confirmados
+Service -> Modelos : Crear LineaComanda(PENDIENTE)
+Modelos -> BD : insert LineaComanda
+BD --> Modelos : Línea creada
+
+Service -> Modelos : Registrar auditoría
+Modelos -> BD : insert LogAuditoria
+
+opt Línea visible para cocina
+  Service -> Socket : emitir kds:actualizado
+  Socket -> KDS : Mostrar nueva línea
+end
+
+Service --> Controller : Línea registrada
+Controller --> Vista : Respuesta OK
+Vista --> Actor : Comanda actualizada
+@enduml

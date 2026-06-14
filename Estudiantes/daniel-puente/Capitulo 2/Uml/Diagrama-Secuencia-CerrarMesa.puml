@@ -1,0 +1,46 @@
+@startuml
+title CU-05 - Cerrar mesa
+
+hide footbox
+skinparam shadowing false
+skinparam backgroundColor white
+
+actor "Administrador" as Actor
+participant "CajaView / MesasView" as Vista
+participant "MesaController" as Controller
+participant "MesaService" as Service
+participant "Modelos Mongoose\n(Mesa, Comanda,\nTicket, LogAuditoria)" as Modelos
+database "MongoDB Atlas" as BD
+participant "SocketService" as Socket
+participant "MesasView\n(otros dispositivos)" as VistaSync
+
+Actor -> Vista : Selecciona mesa pendiente de cierre
+Vista -> Controller : PATCH /api/mesas/:id/cerrar
+Controller -> Service : cerrarMesa(mesaId, usuario_id)
+
+Service -> Modelos : Buscar mesa y comanda activa
+Modelos -> BD : find Mesa / Comanda
+BD --> Modelos : Mesa ocupada y comanda activa
+
+Service -> Modelos : Buscar ticket asociado
+Modelos -> BD : find Ticket por comanda
+BD --> Modelos : Ticket COBRADO
+
+Service -> Service : Validar ticket cobrado
+Service -> Modelos : Actualizar Comanda(CERRADA)
+Modelos -> BD : update Comanda
+
+Service -> Modelos : Actualizar Mesa(LIBRE,\ncomanda_activa_id = null)
+Modelos -> BD : update Mesa
+BD --> Modelos : Mesa liberada
+
+Service -> Modelos : Registrar auditoría
+Modelos -> BD : insert LogAuditoria
+
+Service -> Socket : emitir mesa:actualizada
+Socket -> VistaSync : Actualizar plano de mesas
+
+Service --> Controller : Mesa cerrada
+Controller --> Vista : Respuesta OK
+Vista --> Actor : Mesa libre para nuevo servicio
+@enduml

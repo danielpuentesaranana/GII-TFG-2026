@@ -1,0 +1,77 @@
+@startuml
+title CU-17 - Cobrar ticket en caja
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam ArrowColor #3F8F3F
+skinparam state {
+  BackgroundColor #F5F5F5
+  BorderColor #777777
+  FontColor #111111
+}
+skinparam note {
+  BackgroundColor #FFF8D6
+  BorderColor #C8B45D
+}
+
+state "cobrarTicketEnCaja()" as CobrarTicket {
+  [*] --> AccederCaja
+
+  AccederCaja : El administrador accede\na la vista de caja
+  note right of AccederCaja
+    Precondición:
+    El ticket ha sido enviado a caja
+    y está PENDIENTE de cobro.
+  end note
+
+  AccederCaja --> MostrarTickets
+
+  MostrarTickets : Sistema muestra los tickets\npendientes de cobro
+
+  MostrarTickets --> SeleccionarTicket
+
+  SeleccionarTicket : Administrador selecciona\nun ticket y confirma el cobro
+
+  SeleccionarTicket --> ValidarTicket
+
+  ValidarTicket : Sistema valida que el ticket\nesté en estado PENDIENTE
+
+  ValidarTicket --> MarcarCobrado
+
+  MarcarCobrado : Sistema marca el ticket\ncomo COBRADO
+
+  MarcarCobrado --> RegistrarCobro
+
+  RegistrarCobro : Sistema registra el cobro\nen auditoría con usuario y fecha
+
+  RegistrarCobro --> ActualizarCaja
+
+  ActualizarCaja : Sistema actualiza caja y deja\nla mesa pendiente de cierre
+
+  ActualizarCaja --> [*]
+}
+
+CobrarTicket --> TICKET_COBRADO : cobroConfirmado()
+CobrarTicket --> OPERACION_RECHAZADA : cobroNoValido()
+
+state "TICKET_COBRADO" as TICKET_COBRADO
+state "OPERACION_RECHAZADA" as OPERACION_RECHAZADA
+
+note right of TICKET_COBRADO
+  Postcondición:
+  El ticket queda marcado como COBRADO
+  y la mesa queda pendiente de cierre.
+end note
+
+note right of OPERACION_RECHAZADA
+  La operación se rechaza si el ticket
+  no existe, ya está cobrado
+  o no está pendiente de cobro.
+end note
+
+note bottom of TICKET_COBRADO
+  El cobro no libera la mesa.
+  La liberación se realiza después
+  mediante CU-05 Cerrar mesa.
+end note
+@enduml

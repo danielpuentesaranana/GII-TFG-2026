@@ -1,0 +1,69 @@
+@startuml
+title CU-08 - Editar comanda
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam ArrowColor #3F8F3F
+skinparam state {
+  BackgroundColor #F5F5F5
+  BorderColor #777777
+  FontColor #111111
+}
+skinparam note {
+  BackgroundColor #FFF8D6
+  BorderColor #C8B45D
+}
+
+state "editarComanda()" as EditarComanda {
+  [*] --> AccederComanda
+
+  AccederComanda : El camarero o administrador\naccede a la comanda activa\nde una mesa
+  note right of AccederComanda
+    Precondición:
+    La mesa tiene una comanda activa
+    con líneas en estado PENDIENTE.
+  end note
+
+  AccederComanda --> ModificarLineas
+
+  ModificarLineas : Usuario modifica cantidades,\nobservaciones, añade nuevas líneas\no cancela líneas pendientes
+
+  ModificarLineas --> ValidarEstado
+
+  ValidarEstado : Sistema valida que la comanda\nsiga abierta y que la línea\nesté en estado PENDIENTE
+
+  ValidarEstado --> GuardarCambios
+
+  GuardarCambios : Sistema guarda los cambios\nen la línea de comanda
+
+  GuardarCambios --> ActualizarSistema
+
+  ActualizarSistema : Sistema actualiza Comanda,\nKDS y vista de mesas\nen tiempo real
+
+  ActualizarSistema --> RegistrarAuditoria
+
+  RegistrarAuditoria : Sistema registra la edición\nen auditoría
+
+  RegistrarAuditoria --> [*]
+}
+
+EditarComanda --> COMANDA_ACTUALIZADA : edicionCorrecta()
+EditarComanda --> OPERACION_RECHAZADA : lineaNoEditable()
+
+state "COMANDA_ACTUALIZADA" as COMANDA_ACTUALIZADA
+state "OPERACION_RECHAZADA" as OPERACION_RECHAZADA
+
+note right of COMANDA_ACTUALIZADA
+  Postcondición:
+  La comanda queda actualizada
+  y los cambios se reflejan
+  en el sistema.
+end note
+
+note right of OPERACION_RECHAZADA
+  CU-N05:
+  El sistema bloquea la acción
+  si la línea está EN_PREPARACION,
+  LISTO o SERVIDO.
+end note
+@enduml

@@ -1,0 +1,42 @@
+@startuml
+title CU-12 - Marcar plato como listo
+
+hide footbox
+skinparam shadowing false
+skinparam backgroundColor white
+
+actor "Cocinero" as Actor
+participant "KDSView" as Vista
+participant "KDSController" as Controller
+participant "KdsService" as Service
+participant "Modelos Mongoose\n(LineaComanda, Comanda,\nMesa, LogAuditoria)" as Modelos
+database "MongoDB Atlas" as BD
+participant "SocketService /\nSistema de Notificaciones" as Socket
+participant "MesasView / ComandaView" as Sala
+
+Actor -> Vista : Selecciona línea en preparación
+Actor -> Vista : Pulsa marcar como listo
+Vista -> Controller : PATCH /api/kds/lineas/:lineaId/lista
+Controller -> Service : marcarComoLista(lineaId, usuario_id)
+
+Service -> Modelos : Buscar línea, comanda y mesa
+Modelos -> BD : find LineaComanda / Comanda / Mesa
+BD --> Modelos : Datos de la línea
+Modelos --> Service : Línea EN_PREPARACION
+
+Service -> Service : Validar transición\nEN_PREPARACION -> LISTO
+Service -> Modelos : Actualizar línea a LISTO
+Modelos -> BD : update LineaComanda
+BD --> Modelos : Línea actualizada
+
+Service -> Modelos : Registrar auditoría
+Modelos -> BD : insert LogAuditoria
+
+Service -> Socket : emitir "Platos listos - Mesa X"
+Socket -> Sala : Notificación en tiempo real
+Socket -> Vista : Actualizar tablero KDS
+
+Service --> Controller : Línea LISTO
+Controller --> Vista : Respuesta OK
+Vista --> Actor : Plato marcado como listo
+@enduml

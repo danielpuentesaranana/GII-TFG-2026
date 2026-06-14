@@ -1,0 +1,72 @@
+@startuml
+title CU-14 - Enviar ticket a caja
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam ArrowColor #3F8F3F
+skinparam state {
+  BackgroundColor #F5F5F5
+  BorderColor #777777
+  FontColor #111111
+}
+skinparam note {
+  BackgroundColor #FFF8D6
+  BorderColor #C8B45D
+}
+
+state "enviarTicketACaja()" as EnviarTicket {
+  [*] --> RevisarComanda
+
+  RevisarComanda : El camarero o administrador\nrevisa la comanda de la mesa
+  note right of RevisarComanda
+    Precondición:
+    La mesa tiene una comanda activa
+    preparada para cobro.
+  end note
+
+  RevisarComanda --> SolicitarTicket
+
+  SolicitarTicket : Usuario pulsa la opción\nenviar ticket a caja
+
+  SolicitarTicket --> ValidarComanda
+
+  ValidarComanda : Sistema valida que la comanda\npuede generar ticket y que\nno exista un ticket previo
+
+  ValidarComanda --> CalcularTotal
+
+  CalcularTotal : Sistema calcula el total\ncon líneas de carta,\ntarifas de menú y cantidades
+
+  CalcularTotal --> GenerarTicket
+
+  GenerarTicket : Sistema genera el ticket\ncon desglose completo\nen estado PENDIENTE
+
+  GenerarTicket --> RegistrarAuditoria
+
+  RegistrarAuditoria : Sistema registra la generación\ndel ticket en auditoría
+
+  RegistrarAuditoria --> EnviarCaja
+
+  EnviarCaja : Sistema deja el ticket disponible\nen CajaView para su cobro
+
+  EnviarCaja --> [*]
+}
+
+EnviarTicket --> TICKET_EN_CAJA : ticketGenerado()
+EnviarTicket --> OPERACION_RECHAZADA : ticketNoGenerado()
+
+state "TICKET_EN_CAJA" as TICKET_EN_CAJA
+state "OPERACION_RECHAZADA" as OPERACION_RECHAZADA
+
+note right of TICKET_EN_CAJA
+  Postcondición:
+  El ticket queda generado en caja
+  con el desglose completo.
+end note
+
+note right of OPERACION_RECHAZADA
+  CU-N06:
+  El sistema rechaza la operación
+  si el ticket ya existe
+  o la mesa ya está cobrada.
+end note
+@enduml

@@ -1,0 +1,69 @@
+@startuml
+title CU-12 - Marcar plato como listo
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam ArrowColor #3F8F3F
+skinparam state {
+  BackgroundColor #F5F5F5
+  BorderColor #777777
+  FontColor #111111
+}
+skinparam note {
+  BackgroundColor #FFF8D6
+  BorderColor #C8B45D
+}
+
+state "marcarPlatoComoListo()" as MarcarListo {
+  [*] --> SeleccionarLinea
+
+  SeleccionarLinea : El cocinero selecciona\nen el KDS una línea\nen preparación
+  note right of SeleccionarLinea
+    Precondición:
+    La línea de comanda está
+    en estado EN_PREPARACION.
+  end note
+
+  SeleccionarLinea --> MarcarAccion
+
+  MarcarAccion : El cocinero pulsa la acción\nmarcar como listo
+
+  MarcarAccion --> ValidarEstado
+
+  ValidarEstado : Sistema valida que la línea\npuede pasar a estado LISTO
+
+  ValidarEstado --> ActualizarLinea
+
+  ActualizarLinea : Sistema actualiza la línea\nde comanda a estado LISTO
+
+  ActualizarLinea --> RegistrarAuditoria
+
+  RegistrarAuditoria : Sistema registra el cambio\nde estado en auditoría
+
+  RegistrarAuditoria --> EmitirNotificacion
+
+  EmitirNotificacion : Sistema de notificaciones emite\n\"Platos listos - Mesa X\"\na sala mediante WebSocket
+
+  EmitirNotificacion --> [*]
+}
+
+MarcarListo --> PLATO_LISTO : platoListo()
+MarcarListo --> OPERACION_RECHAZADA : estadoNoValido()
+
+state "PLATO_LISTO" as PLATO_LISTO
+state "OPERACION_RECHAZADA" as OPERACION_RECHAZADA
+
+note right of PLATO_LISTO
+  Postcondición:
+  La línea pasa a estado LISTO
+  y sala recibe el aviso
+  correspondiente.
+end note
+
+note right of OPERACION_RECHAZADA
+  La operación se rechaza si la línea
+  no está en EN_PREPARACION
+  o si ya fue servida/cancelada.
+end note
+
+@enduml

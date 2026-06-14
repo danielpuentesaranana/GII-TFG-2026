@@ -1,0 +1,84 @@
+@startuml
+title Diagrama de Estados  - Comanda
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam state {
+  BackgroundColor #FFF2CC
+  BorderColor #D6A84F
+  FontColor #111111
+  BackgroundColor<<Grupo>> #F5F5F5
+  BorderColor<<Grupo>> #B5B5B5
+}
+skinparam ArrowColor #6B7F7F
+skinparam ArrowThickness 1.2
+
+[*] --> Abierta : Camarero abre mesa\n(crea comanda activa)
+
+note right of Abierta
+  **Estado persistido:** ABIERTA
+  El camarero puede añadir platos
+  o editar líneas pendientes.
+end note
+
+' --- MACROESTADO: SERVICIO ACTIVO ---
+state "En Servicio (Ciclo de Cocina)" as EnServicio <<Grupo>> {
+  
+  state "Líneas en Cocina" as ConLineasEnCocina
+  state "En Preparación" as EnPreparacion
+  state "Lista para Servir" as ListaParaServir
+  state "Servida" as Servida
+
+  [*] --> ConLineasEnCocina : Envío a KDS (Pase)
+  ConLineasEnCocina --> EnPreparacion : Cocina inicia preparación
+  EnPreparacion --> ListaParaServir : Cocina marca "Listo"
+  ListaParaServir --> Servida : Camarero sirve el plato
+  
+  Servida --> ConLineasEnCocina : Camarero añade más platos\n(Segundos / Postres)
+}
+
+Abierta --> EnServicio : Registra primer pedido
+
+' --- FLUJO DE CIERRE Y FACTURACIÓN ---
+
+state "Ticket en Caja" as TicketEnCaja
+note right of TicketEnCaja
+  Generar el ticket no cierra la mesa.
+  La comanda sigue vinculada hasta
+  el cobro y cierre definitivo.
+end note
+
+EnServicio --> TicketEnCaja : Solicita cuenta / Envía a caja
+TicketEnCaja --> Cobrada : Administrador cobra ticket
+
+state Cobrada {
+  [*] --> PendienteDeCierre
+}
+note right of Cobrada
+  **Estado del ticket:** COBRADO
+  El cobro no libera la mesa
+  automáticamente.
+end note
+
+Cobrada --> Cerrada : Administrador cierra mesa
+
+state Cerrada
+note bottom of Cerrada
+  **Estado persistido de Comanda:** CERRADA
+  Mesa liberada.
+end note
+
+Cerrada --> [*]
+
+' --- GESTIÓN DE CANCELACIONES ---
+Abierta --> Cancelada : Incidencia antes del servicio
+EnServicio --> Cancelada : Incidencia / Anulación total
+TicketEnCaja --> Cancelada : Ticket cancelado por admin
+
+state Cancelada
+note bottom of Cancelada
+  **Estado persistido:** CANCELADA
+end note
+
+Cancelada --> [*]
+@enduml

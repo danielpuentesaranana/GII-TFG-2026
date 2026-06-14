@@ -1,0 +1,84 @@
+@startuml
+title CU-06 - Tomar comanda
+
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam ArrowColor #3F8F3F
+skinparam state {
+  BackgroundColor #F5F5F5
+  BorderColor #777777
+  FontColor #111111
+}
+skinparam note {
+  BackgroundColor #FFF8D6
+  BorderColor #C8B45D
+}
+
+state "tomarComanda()" as TomarComanda {
+  [*] --> SeleccionMesa
+
+  SeleccionMesa : El camarero o administrador\nselecciona una mesa ocupada
+  note right of SeleccionMesa
+    Precondición:
+    La mesa está OCUPADA
+    y tiene una comanda activa.
+  end note
+
+  SeleccionMesa --> MostrarCarta
+
+  MostrarCarta : Sistema muestra la carta,\nplatos disponibles y tarifas\nde menú vigentes
+
+  MostrarCarta --> AnadirLinea
+
+  AnadirLinea : Usuario añade platos línea a línea\nindicando cantidad, observaciones\ny alérgenos confirmados
+
+  AnadirLinea --> ValidarDatos
+
+  ValidarDatos : Sistema valida comanda abierta,\nplato disponible, datos obligatorios\ny alérgenos confirmados
+
+  ValidarDatos --> GuardarLinea
+
+  GuardarLinea : Sistema guarda la línea\nde comanda en estado PENDIENTE
+
+  GuardarLinea --> EvaluarKDS
+
+  EvaluarKDS : Sistema comprueba si la línea\ndebe mostrarse en cocina
+
+  EvaluarKDS --> ActualizarKDS
+
+  ActualizarKDS : Sistema actualiza el KDS\nmediante eventos en tiempo real
+
+  ActualizarKDS --> [*]
+}
+
+TomarComanda --> LINEAS_REGISTRADAS : comandaRegistrada()
+TomarComanda --> OPERACION_OFFLINE : sinConexion()
+TomarComanda --> OPERACION_RECHAZADA : datosInvalidos()
+
+state "LINEAS_REGISTRADAS" as LINEAS_REGISTRADAS
+state "OPERACION_OFFLINE" as OPERACION_OFFLINE
+state "OPERACION_RECHAZADA" as OPERACION_RECHAZADA
+
+note right of LINEAS_REGISTRADAS
+  Postcondición:
+  Las líneas quedan registradas
+  y disponibles para cocina
+  cuando corresponda.
+end note
+
+note right of OPERACION_OFFLINE
+  Si no hay conexión, la operación
+  se guarda en IndexedDB y se
+  sincroniza al recuperar la red.
+end note
+
+note right of OPERACION_RECHAZADA
+  CU-N03:
+  Se rechaza si los alérgenos
+  requeridos no están confirmados.
+
+  CU-N07:
+  Se rechaza si el plato no está
+  disponible.
+end note
+@enduml

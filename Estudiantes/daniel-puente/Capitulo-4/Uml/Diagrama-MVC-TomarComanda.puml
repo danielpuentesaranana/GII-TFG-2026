@@ -1,0 +1,54 @@
+@startuml
+title CU-06 - Tomar comanda
+
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+' --- CAPA DE VISTA (Arriba) ---
+package "Vista" {
+  [ComandaView]
+  [KdsView]
+}
+
+' --- CAPA DE CONTROLADOR ---
+package "Controlador" {
+  [ComandaController]
+}
+
+' --- CAPA DE SERVICIO ---
+package "Servicio" {
+  [ComandaService]
+  ' Posicionado a la derecha para gestionar el canal de eventos hacia el KDS
+  [SocketService]
+}
+
+' --- CAPA DE MODELOS / DATOS (Abajo) ---
+package "Modelos" {
+  [Comanda]
+  [LineaComanda]
+  [Plato]
+  [TarifaMenu]
+  [LogAuditoria]
+}
+
+' --- FLUJO PRINCIPAL DE ENTRADA ---
+[ComandaView] -down-> [ComandaController] : POST /api/comandas/:id/lineas
+[ComandaController] -down-> [ComandaService] : agregarLineaComanda()
+
+' --- VALIDACIONES Y PERSISTENCIA (Bloque Central/Izquierdo) ---
+[ComandaService] -down-> [Comanda] : validar comanda ABIERTA
+[ComandaService] -down-> [Plato] : validar disponibilidad\ny alérgenos
+[ComandaService] -down-> [TarifaMenu] : aplicar tarifa si es menú
+[ComandaService] -down-> [LineaComanda] : crear línea PENDIENTE
+[ComandaService] -down-> [LogAuditoria] : registrar alta de línea
+
+' --- CANAL DE TIEMPO REAL (Subida por la Derecha) ---
+[ComandaService] -right-> [SocketService] : emitir línea creada
+[SocketService] -up-> [KdsView] : actualizar KDS
+
+' --- NOTA ACLARATORIA ---
+note top of [KdsView]
+  El KDS recibe líneas de comanda,
+  no la comanda completa.
+end note
+@enduml

@@ -1,0 +1,44 @@
+@startuml
+title CU-12 - Marcar plato como listo
+
+left to right direction
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+actor "Cocinero" as Actor
+
+package "Vista" {
+  component "KdsView" as KdsView
+  component "MesasView" as MesasView
+}
+
+package "Controlador" {
+  component "KDSController\n(CU-12 Marcar plato listo)" as Controller
+}
+
+package "Servicio" {
+  component "KdsService" as Service
+  component "SocketService /\nSistema de Notificaciones" as Socket
+}
+
+package "Modelos" {
+  component "LineaComanda" as Linea
+  component "Comanda" as Comanda
+  component "Mesa" as Mesa
+  component "LogAuditoria" as Log
+}
+
+Actor --> KdsView : marca plato como listo
+KdsView --> Controller : PATCH /api/kds/lineas/:id/lista
+Controller --> Service : marcarComoLista(lineaId)
+Service --> Linea : valida transición\na LISTO
+Service --> Comanda : obtiene comanda asociada
+Service --> Mesa : obtiene mesa afectada
+Service --> Linea : actualiza estado LISTO
+Service --> Log : registra cambio de estado
+Service --> Socket : emite "Platos listos - Mesa X"
+Socket --> KdsView : actualiza tablero KDS
+Socket --> MesasView : avisa a sala
+
+@enduml

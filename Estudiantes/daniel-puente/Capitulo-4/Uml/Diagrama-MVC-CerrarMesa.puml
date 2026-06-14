@@ -1,0 +1,43 @@
+@startuml
+title CU-05 - Cerrar mesa
+
+left to right direction
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+actor "Administrador" as Actor
+
+package "Vista" {
+  component "CajaView" as CajaView
+  component "MesasView" as MesasView
+}
+
+package "Controlador" {
+  component "MesaController\n(CU-05 Cerrar mesa)" as Controller
+}
+
+package "Servicio" {
+  component "MesaService" as Service
+  component "SocketService" as Socket
+}
+
+package "Modelos" {
+  component "Mesa" as Mesa
+  component "Comanda" as Comanda
+  component "Ticket" as Ticket
+  component "LogAuditoria" as Log
+}
+
+Actor --> CajaView : solicita cerrar mesa
+CajaView --> Controller : PATCH /api/mesas/:id/cerrar
+Controller --> Service : cerrarMesa(mesaId)
+Service --> Mesa : obtiene mesa ocupada
+Service --> Comanda : comprueba comanda activa
+Service --> Ticket : valida ticket COBRADO
+Service --> Comanda : actualiza a CERRADA
+Service --> Mesa : libera mesa
+Service --> Log : registra cierre
+Service --> Socket : emite mesa:actualizada
+Socket --> MesasView : actualiza plano de mesas
+@enduml

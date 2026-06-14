@@ -1,0 +1,45 @@
+@startuml
+left to right direction
+
+package views {
+    class MesasView
+    class ComandaView
+    class KDSView
+    class ReservasView
+    class CajaView
+    class UsuariosView
+    class CartaView
+    class LoginView
+}
+
+package controllers {
+    class AuthController
+    class MesaController
+    class ComandaController
+    class KDSController
+    class ReservaController
+    class TicketController
+    class UsuarioController
+    class CartaController
+}
+
+' --- Relaciones de Autenticación 
+MesasView ..> LoginView : auth
+ComandaView ..> LoginView : auth
+KDSView ..> LoginView : auth
+ReservasView ..> LoginView : auth
+CajaView ..> LoginView : auth
+UsuariosView ..> LoginView : auth
+CartaView ..> LoginView : auth
+
+' --- Relaciones a Controladores 
+LoginView --> AuthController
+CajaView --> MesaController
+UsuariosView --> ComandaController
+MesasView --> KDSController
+ComandaView --> ReservaController
+KDSView --> TicketController
+ReservasView --> UsuarioController
+CartaView --> CartaController
+
+@enduml

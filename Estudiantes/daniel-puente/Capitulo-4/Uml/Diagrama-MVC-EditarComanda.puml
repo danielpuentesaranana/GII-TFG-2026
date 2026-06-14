@@ -1,0 +1,43 @@
+@startuml
+title CU-08 - Editar comanda
+
+left to right direction
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+actor "Camarero /\nAdministrador" as Actor
+
+package "Vista" {
+  component "ComandaView" as ComandaView
+  component "KdsView" as KdsView
+}
+
+package "Controlador" {
+  component "ComandaController\n(CU-08 Editar comanda)" as Controller
+}
+
+package "Servicio" {
+  component "ComandaService" as Service
+  component "SocketService" as Socket
+}
+
+package "Modelos" {
+  component "Comanda" as Comanda
+  component "LineaComanda" as Linea
+  component "Plato" as Plato
+  component "LogAuditoria" as Log
+}
+
+Actor --> ComandaView : modifica o cancela\nlínea pendiente
+ComandaView --> Controller : PUT/PATCH línea
+Controller --> Service : actualizarLineaComanda(lineaId)
+Service --> Linea : comprueba estado PENDIENTE
+Service --> Comanda : valida comanda ABIERTA
+Service --> Plato : valida alérgenos si procede
+Service --> Linea : actualiza o cancela línea
+Service --> Log : registra edición
+Service --> Socket : emite cambios
+Socket --> ComandaView : refresca comanda
+Socket --> KdsView : refresca cocina
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+package controllers {
+    class AuthController
+    class MesaController
+    class ComandaController
+    class TicketController
+    class KDSController
+    class ReservaController
+    class UsuarioController
+    class CartaController
+}
+
+package services {
+    class AuthService
+    class MesaService
+    class ComandaService
+    class TicketService
+    class KDSService
+    class ReservaService
+    class UsuarioService
+    class CartaService
+}
+
+' --- Relaciones directas verticales (Controlador -> Servicio) ---
+AuthController -down-> AuthService
+MesaController -down-> MesaService
+ComandaController -down-> ComandaService
+TicketController -down-> TicketService
+KDSController -down-> KDSService
+ReservaController -down-> ReservaService
+UsuarioController -down-> UsuarioService
+CartaController -down-> CartaService
+
+@endum
+@enduml

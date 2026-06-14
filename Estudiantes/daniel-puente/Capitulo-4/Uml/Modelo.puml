@@ -1,0 +1,16 @@
+@startuml
+
+class Zona
+class Mesa
+class Comanda
+class LineaComanda
+
+class Plato
+class TarifaMenu
+class Ticket
+class Reserva
+
+class Usuario
+class LogAuditoria
+
+@endum

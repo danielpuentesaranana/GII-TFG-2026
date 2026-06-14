@@ -1,0 +1,43 @@
+@startuml
+title CU-17 - Cobrar ticket en caja
+
+left to right direction
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+actor "Administrador" as Actor
+
+package "Vista" {
+  component "CajaView" as CajaView
+  component "MesasView" as MesasView
+}
+
+package "Controlador" {
+  component "TicketController\n(CU-17 Cobrar ticket)" as Controller
+}
+
+package "Servicio" {
+  component "TicketService" as Service
+  component "SocketService" as Socket
+}
+
+package "Modelos" {
+  component "Ticket" as Ticket
+  component "Comanda" as Comanda
+  component "Usuario" as Usuario
+  component "LogAuditoria" as Log
+}
+
+Actor --> CajaView : confirma cobro
+CajaView --> Controller : PATCH /api/tickets/:id/cobrar
+Controller --> Service : cobrarTicket(ticketId)
+Service --> Ticket : valida estado PENDIENTE
+Service --> Usuario : asocia usuario cobrador
+Service --> Comanda : mantiene comanda vinculada
+Service --> Ticket : actualiza a COBRADO
+Service --> Log : registra cobro
+Service --> Socket : emite ticket:cobrado
+Socket --> CajaView : actualiza caja
+Socket --> MesasView : mesa pendiente de cierre
+@enduml

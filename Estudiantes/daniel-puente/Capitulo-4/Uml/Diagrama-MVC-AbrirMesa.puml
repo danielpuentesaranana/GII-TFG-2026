@@ -1,0 +1,41 @@
+@startuml
+title CU-04 - Abrir mesa
+
+left to right direction
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+actor "Camarero /\nAdministrador" as Actor
+
+package "Vista" {
+  component "MesasView" as MesasView
+  component "ComandaView" as ComandaView
+}
+
+package "Controlador" {
+  component "ComandaController\n(CU-04 Abrir mesa)" as Controller
+}
+
+package "Servicio" {
+  component "ComandaService" as Service
+  component "SocketService" as Socket
+}
+
+package "Modelos" {
+  component "Mesa" as Mesa
+  component "Comanda" as Comanda
+  component "LogAuditoria" as Log
+}
+
+Actor --> MesasView : solicita abrir mesa
+MesasView --> Controller : POST /api/comandas
+Controller --> Service : abrirComanda(mesa_id)
+Service --> Mesa : valida disponibilidad\ny cambia a OCUPADA
+Service --> Comanda : crea comanda ABIERTA
+Service --> Log : registra apertura
+Service --> Socket : emite actualización
+Socket --> MesasView : actualiza estado de mesa
+MesasView --> ComandaView : continuar toma de pedido
+
+@enduml

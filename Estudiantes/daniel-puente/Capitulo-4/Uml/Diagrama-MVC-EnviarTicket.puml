@@ -1,0 +1,43 @@
+@startuml
+title CU-14 - Enviar ticket a caja
+
+left to right direction
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam componentStyle uml2
+
+actor "Camarero /\nAdministrador" as Actor
+
+package "Vista" {
+  component "ComandaView" as ComandaView
+  component "CajaView" as CajaView
+}
+
+package "Controlador" {
+  component "TicketController\n(CU-14 Enviar ticket a caja)" as Controller
+}
+
+package "Servicio" {
+  component "TicketService" as Service
+  component "SocketService" as Socket
+}
+
+package "Modelos" {
+  component "Comanda" as Comanda
+  component "LineaComanda" as Linea
+  component "Ticket" as Ticket
+  component "LogAuditoria" as Log
+}
+
+Actor --> ComandaView : solicita enviar ticket
+ComandaView --> Controller : POST /api/tickets
+Controller --> Service : generarTicket(comanda_id)
+Service --> Comanda : obtiene comanda activa
+Service --> Linea : obtiene líneas servidas
+Service --> Ticket : comprueba que no exista duplicado
+Service --> Service : calcula carta y menús
+Service --> Ticket : crea ticket PENDIENTE
+Service --> Log : registra generación
+Service --> Socket : emite ticket:generado
+Socket --> CajaView : muestra ticket pendiente
+@enduml

@@ -1,0 +1,40 @@
+@startuml
+skinparam conditionStyle diamond
+skinparam shadowing false
+
+' --- Estilos para las notas de riesgo ---
+skinparam note {
+    BackgroundColor #FFFDD0
+    BorderColor #A0A0A0
+    FontColor red
+}
+
+start
+
+:Cliente llega\nSolicita mesa o reserva;
+
+if (¿Tiene reserva?) then (Sí)
+    :Mesa asignada\nLibro físico en papel;
+else (No)
+    :Espera o posible reserva duplicada;
+endif
+
+:Camarero toma comanda\nLibreta y bolígrafo;
+note right
+    Riesgo: ilegibilidad o pérdida de comanda
+end note
+
+:Comunicación sala -> cocina\nTelefonillo: "sube nota mesa 4";
+note right
+    Sin control de alérgenos ni registro obligatorio
+end note
+
+:Cocina prepara los platos\nSin confirmación digital;
+
+:Aviso al camarero\nTelefonillo o de viva voz;
+
+:Ticket a mano -> cobro\nSin auditoría ni registro;
+
+stop
+@endlump
+@enduml

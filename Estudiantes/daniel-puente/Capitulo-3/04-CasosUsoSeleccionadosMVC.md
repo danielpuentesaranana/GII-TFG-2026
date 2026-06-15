@@ -10,7 +10,7 @@ Este diagrama muestra cómo se inicia el servicio de una mesa. La acción parte 
 
 ## CU-06. Tomar comanda
 
-![MVC CU-06 Tomar comanda](imagenes/Diagrama-MVC-TomarComanda.svg)
+![MVC CU-06 Tomar comanda](imagenes/Diagrama-MVC-TomarComanda.png)
 
 El diagrama representa el alta de líneas de comanda desde `ComandaView`. La operación se envía a `ComandaController` y la lógica se resuelve en `ComandaService`, donde se valida que la comanda esté abierta, que el plato esté disponible, que los alérgenos estén confirmados y que, en caso de menú, se aplique la tarifa correspondiente. El KDS se actualiza mediante eventos en tiempo real.
 

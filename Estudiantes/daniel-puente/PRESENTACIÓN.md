@@ -17,7 +17,7 @@ La gestión actual del restaurante se basa en procesos analógicos:
 
 Aunque este modelo ha funcionado durante años, genera limitaciones en servicios con alta carga de trabajo: pérdida de información, errores de comunicación, menor eficiencia y poca trazabilidad.
 
-![FlujoAnterior](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo-1/imagenes/FlujoAnterior.svg)
+![FlujoAnterior](/Estudiantes/daniel-puente/Capitulo-1/imagenes/FlujoAnterior.svg)
 
 ### Solución propuesta
 
@@ -59,17 +59,17 @@ Desarrollar una PWA local-first para digitalizar la operativa del Restaurante La
 - **MVP:** implementar los casos Must-have con autenticación JWT, arquitectura local-first y notificaciones en tiempo real.
 
 ### Modelo de Dominio
-![Dominio](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/modeloDominio.png)
+![Dominio](/Estudiantes/daniel-puente/Capitulo%202/imagenes/modeloDominio.png)
 ### Diagrama de Clases
-![Clases](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaClases.svg)
+![Clases](/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaClases.svg)
 ### Diagrama de Objetos
-![Objetos](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaObjetos.svg)
+![Objetos](/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaObjetos.svg)
 ### Diagrama de Estados
-![Estados](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaEstadosMesa.svg)
+![Estados](/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaEstadosMesa.svg)
 
 ### Actores
 
-![Actores](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/Actores.svg)
+![Actores](/Estudiantes/daniel-puente/Capitulo%202/imagenes/Actores.svg)
 
 | Actor | Descripción |
 |---|---|
@@ -126,11 +126,11 @@ Desarrollar una PWA local-first para digitalizar la operativa del Restaurante La
 
 ### Casos de uso por actor
 
-![Camarero](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Camarero.svg)
-![Admin](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Admin.svg)
-![Cocinero](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Cocinero.svg)
-![Notis](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-NotificacionesAuto.svg)
-![Negativos](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Negativos.svg)
+![Camarero](/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Camarero.svg)
+![Admin](/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Admin.svg)
+![Cocinero](/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Cocinero.svg)
+![Notis](/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-NotificacionesAuto.svg)
+![Negativos](/Estudiantes/daniel-puente/Capitulo%202/imagenes/CDU-Negativos.svg)
 
 ### Casos de uso más relevantes
 
@@ -144,11 +144,11 @@ Desarrollar una PWA local-first para digitalizar la operativa del Restaurante La
 | CU-17 | Cobrar ticket en caja | 🔴 Must |
 | CU-05 | Cerrar mesa | 🔴 Must |
 
-![Flujo de casos de uso seleccionados](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/flujo-casos-uso-seleccionados.png)
+![Flujo de casos de uso seleccionados](/Estudiantes/daniel-puente/Capitulo%202/imagenes/flujo-casos-uso-seleccionados.png)
 
 ### Diagrama de Contexto
 
-![DiagramaContexto](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaContextoCasosUsoPrincipales.svg)
+![DiagramaContexto](/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaContextoCasosUsoPrincipales.svg)
 
 ### Casos seleccionados
 
@@ -175,7 +175,7 @@ La selección tecnológica busca una solución de bajo coste, mantenible y adecu
 
 ### Analisis de Paquetes
 
-![DiagramaPaquetes](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo-3/imagenes/analisisPaquetes.png)
+![DiagramaPaquetes](/Estudiantes/daniel-puente/Capitulo-3/imagenes/analisisPaquetes.png)
 
 El sistema se organiza en dos bloques principales: **frontend PWA** y **backend Node/Express**, conectados mediante API REST y eventos WebSocket.
 
@@ -193,7 +193,7 @@ Esta separación permite mantener una estructura ordenada: las vistas se encarga
 
 ### Diagrama de Despligue
 
-![DiagramaDespliegue](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo-3/imagenes/diagramaDespligue.png)
+![DiagramaDespliegue](/Estudiantes/daniel-puente/Capitulo-3/imagenes/diagramaDespligue.png)
 
 ### Conclusión
 

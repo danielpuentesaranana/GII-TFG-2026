@@ -150,7 +150,6 @@ Desarrollar una PWA local-first para digitalizar la operativa del Restaurante La
 
 ![DiagramaContexto](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo%202/imagenes/DiagramaContextoCasosUsoPrincipales.svg)
 
-### Casos seleccionados
 
 ### Casos de uso seleccionados
 
@@ -187,13 +186,30 @@ El sistema se organiza en dos bloques principales: **frontend PWA** y **backend 
 
 Esta separación permite mantener una estructura ordenada: las vistas se encargan de la interfaz, los servicios concentran la lógica de negocio y los modelos gestionan la persistencia.
 
-### Diseño arquitectura 
-
-
-
 ### Diagrama de Despligue
 
 ![DiagramaDespliegue](/GII-TFG-2026/Estudiantes/daniel-puente/Capitulo-3/imagenes/diagramaDespligue.png)
+
+### Persistencia: ejemplo de modelo Mongoose
+
+Se utiliza MongoDB Atlas como base de datos documental y Mongoose para definir esquemas, validaciones y referencias entre entidades.
+
+El modelo `LineaComanda` es especialmente relevante porque representa cada plato registrado en una comanda y conecta información funcional clave: comanda, plato, cantidad, observaciones, alérgenos, menú y estado en cocina.
+
+```js
+const lineaComandaSchema = new Schema({
+  comanda_id: { type: Types.ObjectId, ref: 'Comanda', required: true },
+  plato_id: { type: Types.ObjectId, ref: 'Plato', required: true },
+  cantidad: { type: Number, required: true, min: 1 },
+  observaciones: { type: String, required: true },
+  alergenos: [{ type: String }],
+  esMenu: { type: Boolean, default: false },
+  estado: {
+    type: String,
+    enum: ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'SERVIDO', 'CANCELADO'],
+    default: 'PENDIENTE'
+  }
+});
 
 ### Conclusión
 

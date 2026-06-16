@@ -190,26 +190,6 @@ Esta separación permite mantener una estructura ordenada: las vistas se encarga
 
 ![DiagramaDespliegue](/Estudiantes/daniel-puente/Capitulo-3/imagenes/diagramaDespligue.png)
 
-### Persistencia: ejemplo de modelo Mongoose
-
-Se utiliza MongoDB Atlas como base de datos documental y Mongoose para definir esquemas, validaciones y referencias entre entidades.
-
-El modelo `LineaComanda` es especialmente relevante porque representa cada plato registrado en una comanda y conecta información funcional clave: comanda, plato, cantidad, observaciones, alérgenos, menú y estado en cocina.
-
-```js
-const lineaComandaSchema = new Schema({
-  comanda_id: { type: Types.ObjectId, ref: 'Comanda', required: true },
-  plato_id: { type: Types.ObjectId, ref: 'Plato', required: true },
-  cantidad: { type: Number, required: true, min: 1 },
-  observaciones: { type: String, required: true },
-  alergenos: [{ type: String }],
-  esMenu: { type: Boolean, default: false },
-  estado: {
-    type: String,
-    enum: ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'SERVIDO', 'CANCELADO'],
-    default: 'PENDIENTE'
-  }
-});
 
 ### Conclusión
 
@@ -233,3 +213,25 @@ Los casos de uso principales del flujo sala-cocina-caja quedan cubiertos: abrir 
 | Media | Temporizadores en KDS. | Detectar retrasos de cocina por mesa o plato. |
 | Media | Sugerencia automática de mesas para reservas. | Mejorar rotación y ocupación del restaurante. |
 | Baja | Estadísticas por camarero. | Analizar carga de trabajo y rendimiento. |
+
+
+### Persistencia: ejemplo de modelo Mongoose
+
+Se utiliza MongoDB Atlas como base de datos documental y Mongoose para definir esquemas, validaciones y referencias entre entidades.
+
+El modelo `LineaComanda` es especialmente relevante porque representa cada plato registrado en una comanda y conecta información funcional clave: comanda, plato, cantidad, observaciones, alérgenos, menú y estado en cocina.
+
+```js
+const lineaComandaSchema = new Schema({
+  comanda_id: { type: Types.ObjectId, ref: 'Comanda', required: true },
+  plato_id: { type: Types.ObjectId, ref: 'Plato', required: true },
+  cantidad: { type: Number, required: true, min: 1 },
+  observaciones: { type: String, required: true },
+  alergenos: [{ type: String }],
+  esMenu: { type: Boolean, default: false },
+  estado: {
+    type: String,
+    enum: ['PENDIENTE', 'EN_PREPARACION', 'LISTO', 'SERVIDO', 'CANCELADO'],
+    default: 'PENDIENTE'
+  }
+});
